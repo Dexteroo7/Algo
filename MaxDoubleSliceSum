@@ -1,0 +1,50 @@
+/**
+ * https://codility.com/programmers/task/max_double_slice_sum/
+ * Created by dexter on 15/07/2016.
+ */
+public class MaxDoubleSliceSum {
+
+    public static void main(String[] args) {
+
+        System.out.println(solution(4, 5, 4, 4, 4));
+    }
+
+    /**
+     * 3, 2, 6, -1, 4, 5, -1, 2
+     */
+    public static int solution(int... A) {
+
+        //only empty double slice is possible
+        if (A.length < 4)
+            return 0;
+
+        /**
+         * first and last element of the array can not
+         * be part of the sums due to given constraints
+         */
+
+        final int[] endingSums = new int[A.length];
+        endingSums[0] = 0; //index 0 can not be part of sum
+        for (int index = 1; index < A.length - 1; index++)
+            endingSums[index] = Math.max(endingSums[index - 1] + A[index], 0);
+
+        final int[] startingSums = new int[A.length];
+        startingSums[A.length - 1] = 0; //last index can not be part of sum
+        for (int index = A.length - 2; index >= 0; index--)
+            startingSums[index] = Math.max(startingSums[index + 1] + A[index], 0);
+
+        int count = 0;
+        //pivot can not be 0 or last element due to given constraints
+        for (int pivot = 1; pivot < A.length - 1; pivot++) {
+
+            final int endingSum = endingSums[pivot - 1];
+            final int startingSum = startingSums[pivot + 1];
+
+            final int sum = endingSum + startingSum;
+            if (sum > count)
+                count = sum;
+        }
+
+        return count;
+    }
+}
