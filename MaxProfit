@@ -1,0 +1,31 @@
+public class MaxProfit {
+
+    public static void main(String[] args) {
+
+        System.out.println(solution(4, 5, 4, 4, 4));
+    }
+
+    public static int solution(int... A) {
+
+        //not possible to turn a profit
+        if (A.length < 2)
+            return 0;
+
+        int currentMinimum = A[0];
+        int profit = 0;
+        for (int index = 1; index < A.length; index++) {
+
+            //calculate profit if bought at previously minimum and sold now
+            final int currentPrice = A[index];
+            final int currentProfit = currentPrice - currentMinimum;
+            if (currentProfit > profit)
+                profit = currentProfit;
+
+            //update the running minimum stock price
+            if (currentPrice < currentMinimum)
+                currentMinimum = currentPrice;
+        }
+
+        return profit;
+    }
+}
