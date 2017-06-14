@@ -1,0 +1,76 @@
+//https://codility.com/programmers/lessons/6-sorting/number_of_disc_intersections/start/
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Created by ayushverma on 14/06/17.
+ */
+public class Test {
+
+	public static void main(String[] args) {
+
+		List<EventType> gg = new ArrayList<>();
+		gg.add(EventType.END);
+		gg.add(EventType.START);
+		Collections.sort(gg);
+		System.out.println(gg);
+	}
+
+	private enum EventType {
+
+		START,
+		END
+	}
+
+	private class Event implements Comparable<Event> {
+
+		EventType eventType;
+		long index;
+
+		public Event(EventType eventType, long index) {
+			this.eventType = eventType;
+			this.index = index;
+		}
+
+		@Override
+		public int compareTo(Event o) {
+			int compare = Long.compare(index, o.index);
+			if (compare == 0) {
+				return eventType.compareTo(o.eventType);
+			}
+			return compare;
+		}
+	}
+
+	public int solution(int[] A) {
+		// write your code in Java SE 8
+
+		List<Event> events = new ArrayList<>();
+		for (int i = 0; i < A.length; i++) {
+			events.add(new Event(EventType.START, i - A[i]));
+			events.add(new Event(EventType.END, i + A[i]));
+		}
+		Collections.sort(events);
+
+		long discCount = 0;
+		long intersections = 0;
+		for (Event event : events) {
+			switch (event.eventType) {
+				case START:
+					intersections = intersections + discCount;
+					discCount++;
+					break;
+				case END:
+					discCount--;
+					break;
+			}
+
+			if (intersections > 10000000)
+				return -1;
+		}
+
+		return (int) intersections;
+	}
+}
