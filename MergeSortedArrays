@@ -1,0 +1,42 @@
+	public List<Integer> mergeKLists(int[][] arrays) {
+
+		//convert to more manageable structure
+		LinkedList<LinkedList<Integer>> buffer = Stream.of(arrays)
+													   .map(array -> IntStream.of(array).boxed().collect(toCollection(LinkedList::new)))
+													   .collect(toCollection(LinkedList::new));
+
+		ArrayList<Integer> toReturn = new ArrayList<>();
+
+		//pick first element from each list
+		PriorityQueue<SourcedInt> minHeap = buffer.stream().map(list -> new SourcedInt(list.poll(), list))
+												  .collect(toCollection(PriorityQueue::new));
+		while (!minHeap.isEmpty()) {
+
+			//poll from smallest element
+			SourcedInt minInt = minHeap.poll();
+			toReturn.add(minInt.value);
+
+			//add next element from same list
+			LinkedList<Integer> nextSource = minInt.source;
+			if (!nextSource.isEmpty())
+				minHeap.add(new SourcedInt(nextSource.poll(), nextSource));
+		}
+
+		return toReturn;
+	}
+
+	private static final class SourcedInt implements Comparable<SourcedInt> {
+
+		int value;
+		LinkedList<Integer> source;
+
+		public SourcedInt(int value, LinkedList<Integer> source) {
+			this.value = value;
+			this.source = source;
+		}
+
+		@Override
+		public int compareTo(SourcedInt o) {
+			return Integer.compare(value, o.value);
+		}
+	}
