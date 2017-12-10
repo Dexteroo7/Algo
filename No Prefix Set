@@ -1,0 +1,101 @@
+//https://www.hackerrank.com/challenges/no-prefix-set/problem
+
+private static final class TrieNode implements Comparable<Character> {
+
+		private final char tireChar;
+		private final List<TrieNode> children = new ArrayList<>();
+
+		private boolean isEnd = false;
+
+		private TrieNode(char tireChar) {
+			this.tireChar = tireChar;
+		}
+
+		public Character getTireChar() {
+			return tireChar;
+		}
+
+		private boolean hasChildren() {
+			return children.size() > 0;
+		}
+
+		private TrieNode addCharacter(char toAdd) {
+
+			int index = Collections.binarySearch(children, toAdd);
+			if (index >= 0) {
+				return children.get(index);
+			} else {
+				TrieNode trieNode = new TrieNode(toAdd);
+				children.add((index * -1) - 1, trieNode);
+				return trieNode;
+			}
+		}
+
+		public boolean isEnd() {
+			return isEnd;
+		}
+
+		private boolean markEnd() {
+			return this.isEnd = true;
+		}
+
+		@Override
+		public int compareTo(Character o) {
+			return this.getTireChar().compareTo(o);
+		}
+	}
+
+	private static final class Trie {
+
+		private static Trie getInstance() {
+			return new Trie(new TrieNode((char) -1));
+		}
+
+		private final TrieNode root;
+
+		private Trie(TrieNode root) {
+			this.root = root;
+		}
+
+		private boolean insert(String word) {
+
+			//start crawling from root
+			TrieNode currentNode = root;
+
+			//iterate over all characters of this word
+			Iterable<Character> characters = word.chars().mapToObj(x -> (char) x)::iterator;
+			for (Character toAdd : characters) {
+				currentNode = currentNode.addCharacter(toAdd);
+				if (currentNode.isEnd)
+					return false;
+			}
+
+			//mark as end for last character
+			currentNode.markEnd();
+			//if current node has children, then return false
+			return !currentNode.hasChildren();
+		}
+	}
+
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+		int count = scanner.nextInt();
+
+		if (count == 0)
+			return;
+
+		Trie instance = Trie.getInstance();
+
+		for (int i = 0; i < count; i++) {
+
+			String toInsert = scanner.next();
+			if (!instance.insert(toInsert)) {
+				System.out.println("BAD SET");
+				System.out.println(toInsert);
+				return;
+			}
+		}
+
+		System.out.println("GOOD SET");
+	}
