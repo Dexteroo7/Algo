@@ -1,0 +1,83 @@
+https://www.hackerrank.com/challenges/largest-rectangle/problem
+
+	private static final class Rectangle {
+
+		final int height;
+		int length = 1;
+
+		private Rectangle(int height) {
+			this.height = height;
+		}
+
+		private void incrementLength() {
+			this.length++;
+		}
+
+		private void setLength(int length) {
+
+			if (this.length < length)
+				this.length = length;
+		}
+
+		private long getArea() {
+			long a = height;
+			long b = length;
+			return a * b;
+		}
+	}
+
+	private static long largestRectangle(int[] h) {
+
+		List<Rectangle> list = new ArrayList<>();
+
+		long maxArea = Long.MIN_VALUE;
+
+		for (int newHeight : h) {
+
+			Rectangle toAdd = new Rectangle(newHeight);
+			boolean insert = true;
+
+			Iterator<Rectangle> iterator = list.iterator();
+			while (iterator.hasNext()) {
+				Rectangle current = iterator.next();
+				if (current.height > toAdd.height) {
+					toAdd.setLength(current.length + 1);
+					long area = toAdd.getArea();
+					if (area > maxArea)
+						maxArea = area;
+					iterator.remove();
+				} else if (current.height == toAdd.height) {
+					current.incrementLength();
+					long area = current.getArea();
+					if (area > maxArea)
+						maxArea = area;
+					insert = false;
+				} else {
+					current.incrementLength();
+					long area = current.getArea();
+					if (area > maxArea)
+						maxArea = area;
+				}
+			}
+			if (insert) {
+				list.add(toAdd);
+				long area = toAdd.getArea();
+				if (area > maxArea)
+					maxArea = area;
+			}
+		}
+
+		return maxArea;
+	}
+
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
+		int n = in.nextInt();
+		int[] h = new int[n];
+		for (int h_i = 0; h_i < n; h_i++) {
+			h[h_i] = in.nextInt();
+		}
+		long result = largestRectangle(h);
+		System.out.println(result);
+		in.close();
+	}
