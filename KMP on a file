@@ -1,0 +1,84 @@
+	private static List<Integer> getMatches(String pattern, ByteBuffer byteBuffer) {
+
+		if (pattern.isEmpty() || byteBuffer.remaining() == 0 || pattern.length() > byteBuffer.remaining())
+			return Collections.emptyList();
+
+		List<Integer> matches = new ArrayList<>();
+
+		int[] lpsArray = computeLPSArray(pattern);
+		int i = 0;
+		int j = 0;
+
+		while (i < byteBuffer.limit()) {
+
+			char a = (char) byteBuffer.get(i);
+			char b = pattern.charAt(j);
+
+			if (a != b) {
+
+				if (j > 0) {
+					//move j forward to skip checking characters
+					j = lpsArray[j - 1];
+				} else {
+					//no matches in window, move forward
+					i++;
+				}
+			} else {
+				//its a match
+				i++;
+				j++;
+			}
+
+			if (j == pattern.length()) {
+				matches.add(i - j);
+				j = lpsArray[j - 1];
+			}
+		}
+
+		return matches;
+	}
+
+	private static int[] computeLPSArray(String toCheck) {
+
+		if (toCheck.length() <= 1)
+			return new int[0];
+
+		int[] lpsArray = new int[toCheck.length()];
+		lpsArray[0] = 0;
+		int previousLPPS = 0;
+		int index = 1;
+
+		while (index < toCheck.length()) {
+
+			char a = toCheck.charAt(index);
+			char b = toCheck.charAt(previousLPPS);
+
+			if (a == b) {
+				previousLPPS++;
+				lpsArray[index] = previousLPPS;
+				index++;
+			} else {
+
+				if (previousLPPS > 0) {
+					previousLPPS = lpsArray[previousLPPS - 1];
+				} else {
+					lpsArray[index] = 0;
+					index++;
+				}
+			}
+		}
+
+		return lpsArray;
+	}
+
+	public static void main(String[] args) throws IOException {
+
+		Files.write(Paths.get("test"),
+					"aaa\nbbb\nccc\nbooking".getBytes(),
+					StandardOpenOption.CREATE);
+
+		RandomAccessFile file = new RandomAccessFile("test", "r");
+		MappedByteBuffer mappedFile = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+
+		Integer index = getMatches("booking", mappedFile).get(0);
+	}
