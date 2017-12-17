@@ -1,0 +1,32 @@
+	private static ArrayList<Integer> findIncreasingTriplet(int a[]) {
+
+		if (a.length <= 2)
+			return new ArrayList<>();
+
+		int minSoFar = a[0];
+
+		//our triplet
+		int low = Integer.MAX_VALUE;
+		int mid = Integer.MAX_VALUE;
+		boolean possible = false;
+
+		for (int element : a) {
+
+			if (element <= minSoFar)
+				minSoFar = element;
+			else if (element <= mid) {
+
+				low = minSoFar;
+				mid = element;
+				possible = true;
+			} else if (possible) {
+				ArrayList<Integer> toReturn = new ArrayList<>();
+				toReturn.add(low);
+				toReturn.add(mid);
+				toReturn.add(element);
+				return toReturn;
+			}
+		}
+
+		return new ArrayList<>();
+	}
