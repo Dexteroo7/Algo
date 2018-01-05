@@ -1,0 +1,55 @@
+	public List<List<Integer>> generate(int numRows) {
+
+		if (numRows == 0)
+			return Collections.emptyList();
+
+		List<List<Integer>> toReturn = new ArrayList<>(numRows);
+
+		//initialize
+		toReturn.add(Collections.singletonList(1));
+		for (int i = 2; i <= numRows; i++) {
+
+			Integer[] newRow = new Integer[i];
+			//first and last will be 1
+			newRow[0] = 1;
+			newRow[i - 1] = 1;
+
+			//previous array
+			List<Integer> previous = toReturn.get(i - 2);
+			for (int j = 1; j < i - 1; j++) {
+				newRow[j] = previous.get(j - 1) + previous.get(j);
+			}
+
+			toReturn.add(Arrays.asList(newRow));
+		}
+
+		return toReturn;
+	}
+
+	public List<Integer> getRow(int rowIndex) {
+
+		rowIndex++;
+		if (rowIndex == 0)
+			return Collections.emptyList();
+		if (rowIndex == 1)
+			return Collections.singletonList(1);
+
+		Integer[] finalArray = new Integer[rowIndex];
+		//initialize
+		finalArray[0] = 1;
+		finalArray[1] = 1;
+
+		for (int i = 2; i <= rowIndex; i++) {
+
+			int previousValue = 1;
+			//generating i'th row
+			for (int j = 1; j < i - 1; j++) {
+
+				int newValue = previousValue + finalArray[j];
+				previousValue = finalArray[j];
+				finalArray[j] = newValue;
+			}
+			finalArray[i - 1] = 1;
+		}
+		return Arrays.asList(finalArray);
+	}
