@@ -1,0 +1,34 @@
+https://leetcode.com/problems/simplify-path/description/
+
+public String simplifyPath(String source) {
+
+		String[] commands = source.split("/");
+
+		Stack<String> directories = new Stack<>();
+
+		for (String command : commands) {
+
+			switch (command) {
+
+				//ignore empty results
+				case "": {
+					break;
+				}
+				//stay at current directory
+				case ".": {
+					break;
+				}
+				//pop current directory
+				case "..": {
+					if (!directories.isEmpty())
+						directories.pop();
+					break;
+				}
+				//add new directory
+				default:
+					directories.add(command);
+			}
+		}
+
+		return "/" + String.join("/", directories);
+}
