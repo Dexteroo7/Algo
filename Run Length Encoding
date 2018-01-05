@@ -1,0 +1,27 @@
+	public static String encode(String source) {
+
+		//edge case
+		if (source.length() == 1)
+			return source + "1";
+
+		StringBuffer dest = new StringBuffer();
+
+		char runningChar = source.charAt(0);
+		int runLength = 1;
+
+		for (int i = 1; i < source.length(); i++) {
+
+			char currentChar = source.charAt(i);
+			if (currentChar == runningChar) {
+				runLength++;
+			} else {
+				dest.append(runningChar).append(runLength);
+				runLength = 1;
+				runningChar = currentChar;
+			}
+		}
+
+		dest.append(runningChar).append(runLength);
+
+		return dest.toString();
+	}
