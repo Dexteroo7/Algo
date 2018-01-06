@@ -1,0 +1,13 @@
+https://practice.geeksforgeeks.org/problems/palindrome-string/
+
+	private static boolean isPalindrome(String toCheck) {
+
+		int i = 0, j = toCheck.length() - 1;
+		while (i < j) {
+			if (toCheck.charAt(i) != toCheck.charAt(j))
+				return false;
+			i++;
+			j--;
+		}
+		return true;
+	}
