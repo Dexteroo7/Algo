@@ -1,4 +1,6 @@
-	private static void lineManagement(String[][] input) {
+https://www.careercup.com/question?id=4891677221191680
+
+private static void lineManagement(String[][] input) {
 
 		Map<String, List<String>> whoManagesWhom = new HashMap<>();
 		for (int i = 0; i < input.length; i++) {
