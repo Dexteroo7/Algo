@@ -1,0 +1,51 @@
+//Determining number of swaps needed to turn a given square pattern into a checkerboard pattern.
+
+//assuming a valid square checkered pattern IS possible
+	private static int minSwap2(char[][] board) {
+
+		//starts with B
+		BiFunction<Integer, Integer, Character> startsWithB = (rowIndex, columnIndex) -> (rowIndex + columnIndex) % 2 == 0 ? 'B' : 'W';
+		//starts with W
+		BiFunction<Integer, Integer, Character> startsWithW = (rowIndex, columnIndex) -> (rowIndex + columnIndex) % 2 == 0 ? 'W' : 'B';
+
+		//minimum swaps required to convert this board into a checkered board
+		if (board[0].length % 2 == 0) {
+
+			//if even number of rows, we have 2 options
+			return Integer.min(minSwap2(board, startsWithB), minSwap2(board, startsWithW));
+
+		} else {
+
+			//if odd number of rows, if B is more than W than "startsWithB" else "startsWithW"
+			int bCount = 0, wCount = 0;
+			for (int i = 0; i < board.length; i++) {
+				for (int j = 0; j < board[i].length; j++) {
+					if (board[i][j] == 'B')
+						bCount++;
+					else
+						wCount++;
+				}
+			}
+			if (bCount > wCount)
+				return minSwap2(board, startsWithB);
+			else
+				return minSwap2(board, startsWithW);
+		}
+	}
+
+	private static int minSwap2(char[][] board, BiFunction<Integer, Integer, Character> expected) {
+
+		//record count of bad indices, half as many swaps are needed...
+		int badIndices = 0;
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				if (board[i][j] != expected.apply(i, j))
+					badIndices++;
+			}
+		}
+
+		if (badIndices % 2 != 0)
+			throw new IllegalStateException("WTF...." + badIndices);
+
+		return badIndices / 2;
+	}
