@@ -1,0 +1,45 @@
+https://practice.geeksforgeeks.org/problems/subsets/0
+
+private static LinkedHashSet<String> printSubsets(int[] gg) {
+
+		int powerSetSize = 1 << gg.length;
+		List<String> toReturn = new ArrayList<>(powerSetSize);
+
+		StringBuilder builder = new StringBuilder();
+		for (int counter = 0; counter < powerSetSize; counter++) {
+
+			builder.setLength(0);
+			for (int i = 0; i < gg.length; i++) {
+				//if i'th bit in counter is set, then print i'th character
+				if ((counter & (1 << i)) > 0)
+					builder.append(gg[i]).append(' ');
+			}
+			if (builder.length() > 0)
+				builder.setLength(builder.length() - 1);
+			toReturn.add(builder.toString());
+		}
+		toReturn.sort(Comparator.naturalOrder());
+
+		return new LinkedHashSet<>(toReturn);
+	}
+
+	public static void main(String[] args) {
+
+		Scanner input = new Scanner(System.in);
+		int testCases = input.nextInt();
+		for (int i = 0; i < testCases; i++) {
+
+			int arraySize = input.nextInt();
+			int[] arr = new int[arraySize];
+			for (int j = 0; j < arraySize; j++) {
+				arr[j] = input.nextInt();
+			}
+			Arrays.sort(arr);
+
+			Collection<String> toPrint = printSubsets(arr);
+			for (String subset : toPrint) {
+				System.out.print(String.format("(%s)", subset));
+			}
+			System.out.println();
+		}
+	}
