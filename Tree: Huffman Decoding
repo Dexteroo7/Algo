@@ -1,0 +1,16 @@
+https://www.hackerrank.com/challenges/tree-huffman-decoding/problem
+
+	void decode(String S, Node root) {
+
+		Node current = root;
+		for (int i = 0; i < S.length(); i++) {
+
+			char currentChar = S.charAt(i);
+			current = currentChar == '1' ? current.right : current.left;
+			//print if leaf node and move back to root
+			if (current.left == null && current.right == null) {
+				System.out.print(current.data);
+				current = root;
+			}
+		}
+	}
