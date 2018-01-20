@@ -1,0 +1,43 @@
+https://app.codility.com/programmers/lessons/5-prefix_sums/min_avg_two_slice/
+
+	public static int solution(int[] arr) {
+
+		if (arr.length < 3)
+			return 0;
+		
+		//need to keep track of minimum sum, upto and including previous index
+		int minIndex = 0;
+		int minSum = arr[0] + arr[1];
+		int minSliceSize = 2;
+
+		int runningMin = arr[0] + arr[1];
+		int startIndexOfRunningMin = 0;
+		int sizeOfRunningMin = 2;
+
+		for (int index = 2; index < arr.length; index++) {
+
+			int current = arr[index];
+			//we have two options;
+			int sumA = current + runningMin;
+			int sizeA = sizeOfRunningMin + 1;
+			int sumB = current + arr[index - 1];
+			int sizeB = 2;
+
+			if (sumA * sizeB < sumB * sizeA) {
+				runningMin = sumA;
+				sizeOfRunningMin = sizeA;
+			} else {
+				runningMin = sumB;
+				startIndexOfRunningMin = index - 1;
+				sizeOfRunningMin = sizeB;
+			}
+
+			if (runningMin * minSliceSize < minSum * sizeOfRunningMin) {
+				minSum = runningMin;
+				minIndex = startIndexOfRunningMin;
+				minSliceSize = sizeOfRunningMin;
+			}
+		}
+
+		return minIndex;
+	}
