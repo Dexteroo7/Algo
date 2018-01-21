@@ -1,50 +1,47 @@
-/**
- * https://codility.com/programmers/task/max_double_slice_sum/
- * Created by dexter on 15/07/2016.
- */
-public class MaxDoubleSliceSum {
 
-    public static void main(String[] args) {
+//https://codility.com/programmers/task/max_double_slice_sum/
+	public static int solution(int... values) {
 
-        System.out.println(solution(4, 5, 4, 4, 4));
-    }
+		if (values.length < 4)
+			return 0;
 
-    /**
-     * 3, 2, 6, -1, 4, 5, -1, 2
-     */
-    public static int solution(int... A) {
+		//max sum of slice ending at i
+		int[] maxEndingSums = new int[values.length];
+		maxEndingSums[0] = 0;
+		for (int index = 1; index < values.length - 1; index++) {
 
-        //only empty double slice is possible
-        if (A.length < 4)
-            return 0;
+			int previousMaxSum = maxEndingSums[index - 1];
+			int includingSum = previousMaxSum + values[index];
+			if (includingSum < 0)
+				maxEndingSums[index] = 0;
+			else
+				maxEndingSums[index] = includingSum;
+		}
 
-        /**
-         * first and last element of the array can not
-         * be part of the sums due to given constraints
-         */
+		//max sum of slice stating at i
+		int[] maxStartingSums = new int[values.length];
+		maxStartingSums[values.length - 1] = 0;
+		for (int index = values.length - 2; index >= 0; index--) {
 
-        final int[] endingSums = new int[A.length];
-        endingSums[0] = 0; //index 0 can not be part of sum
-        for (int index = 1; index < A.length - 1; index++)
-            endingSums[index] = Math.max(endingSums[index - 1] + A[index], 0);
+			int previousMaxSum = maxStartingSums[index + 1];
+			int includingSum = previousMaxSum + values[index];
+			if (includingSum < 0)
+				maxStartingSums[index] = 0;
+			else
+				maxStartingSums[index] = includingSum;
+		}
 
-        final int[] startingSums = new int[A.length];
-        startingSums[A.length - 1] = 0; //last index can not be part of sum
-        for (int index = A.length - 2; index >= 0; index--)
-            startingSums[index] = Math.max(startingSums[index + 1] + A[index], 0);
+		//move the pivot, calculating the the sums
+		int maxSum = 0;
+		for (int pivot = 1; pivot < values.length - 1; pivot++) {
 
-        int count = 0;
-        //pivot can not be 0 or last element due to given constraints
-        for (int pivot = 1; pivot < A.length - 1; pivot++) {
+			//max sum of slice ending at pivot - 1
+			int sumA = maxEndingSums[pivot - 1];
+			//max sum of slice starting at pivot + 1
+			int sumB = maxStartingSums[pivot + 1];
+			if (sumA + sumB > maxSum)
+				maxSum = sumA + sumB;
+		}
 
-            final int endingSum = endingSums[pivot - 1];
-            final int startingSum = startingSums[pivot + 1];
-
-            final int sum = endingSum + startingSum;
-            if (sum > count)
-                count = sum;
-        }
-
-        return count;
-    }
-}
+		return maxSum;
+	}
