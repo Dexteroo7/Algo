@@ -1,0 +1,52 @@
+https://app.codility.com/programmers/lessons/15-caterpillar_method/abs_distinct/
+
+	public static int solution(int[] arr) {
+
+		//find the smallest non negative integer
+		int startIndex;
+		for (startIndex = 0; startIndex < arr.length; startIndex++) {
+			if (arr[startIndex] >= 0)
+				break;
+		}
+		if (startIndex == arr.length)
+			startIndex = 0;
+
+		int leftPointer = startIndex;
+		int rightPointer = startIndex;
+		long pastLeft, pastRight, absoluteDistinctCount = 1;
+		pastLeft = pastRight = absolute(arr[startIndex]);
+
+		boolean breakNow = false;
+		while (!breakNow) {
+
+			if (leftPointer <= 0 && rightPointer >= arr.length - 1)
+				breakNow = true;
+
+			long currentLeft = pastLeft;
+			long currentRight = pastRight;
+
+			while ((currentRight <= currentLeft || leftPointer <= 0) && rightPointer < arr.length) {
+
+				currentRight = absolute(arr[rightPointer]);
+				rightPointer++;
+				if (currentRight != pastLeft && currentRight != pastRight)
+					absoluteDistinctCount++;
+				pastRight = currentRight;
+			}
+
+			while ((currentLeft <= currentRight || rightPointer >= arr.length - 1) && leftPointer >= 0) {
+
+				currentLeft = absolute(arr[leftPointer]);
+				leftPointer--;
+				if (currentLeft != pastLeft && currentLeft != pastRight)
+					absoluteDistinctCount++;
+				pastLeft = currentLeft;
+			}
+		}
+
+		return (int) absoluteDistinctCount;
+	}
+
+	private static long absolute(long value) {
+		return value < 0 ? -value : value;
+	}
