@@ -1,0 +1,70 @@
+https://practice.geeksforgeeks.org/problems/phone-directory/0
+
+	private static final class Trie {
+
+		final int character;
+		final Trie[] children = new Trie[27];
+		final Set<String> suggestions = new TreeSet<>();
+
+		private Trie(int character) {
+			this.character = character;
+		}
+
+		void addWord(String word) {
+
+			Trie current = this;
+			for (int i = 0; i < word.length(); i++) {
+
+				int character = word.charAt(i) - 'a';
+				if (current.children[character] == null)
+					current.children[character] = new Trie(character);
+				current = current.children[character];
+				current.suggestions.add(word);
+			}
+		}
+
+		void search(String query) {
+
+			Trie current = this;
+			for (int i = 0; i < query.length(); i++) {
+
+				int character = query.charAt(i) - 'a';
+				if (current == null)
+					System.out.print("0 ");
+				else {
+
+					if (current.children[character] == null) {
+
+						System.out.print("0 ");
+						current = null;
+					} else {
+
+						current = current.children[character];
+						//print all the suggestions at this stage
+						current.suggestions.forEach(word -> System.out.print(word + " "));
+					}
+				}
+				System.out.println();
+			}
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+		int testCases = Integer.parseInt(input.readLine());
+
+		for (int i = 0; i < testCases; i++) {
+
+			input.readLine();
+			String[] words = input.readLine().split(" ");
+			Trie root = new Trie(-1);
+			for (int j = 0; j < words.length; j++)
+				root.addWord(words[j]);
+
+			String query = input.readLine();
+			root.search(query);
+		}
+	}
