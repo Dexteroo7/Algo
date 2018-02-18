@@ -1,0 +1,28 @@
+https://practice.geeksforgeeks.org/problems/next-larger-element/0
+
+	private static int[] nextGreater(int[] arr) {
+
+		if (arr.length == 1)
+			return new int[] { -1 };
+
+		int[] toReturn = new int[arr.length];
+		Arrays.fill(toReturn, -1);
+
+		Stack<IndexedInt> stack = new Stack<>();
+		stack.push(new IndexedInt(0, arr[0]));
+
+		for (int i = 1; i < arr.length; i++) {
+
+			int element = arr[i];
+			while (!stack.isEmpty() && stack.peek().value < element) {
+
+				//element is next greater for this
+				IndexedInt popped = stack.pop();
+				toReturn[popped.index] = element;
+			}
+
+			stack.push(new IndexedInt(i, element));
+		}
+
+		return toReturn;
+	}
