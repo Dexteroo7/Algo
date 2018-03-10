@@ -1,0 +1,72 @@
+https://practice.geeksforgeeks.org/problems/minimum-sum-partition/0	
+  
+  private static final class Key {
+
+		final int sumA, sumB, index;
+
+		private Key(int sumA, int sumB, int index) {
+			this.sumA = sumA;
+			this.sumB = sumB;
+			this.index = index;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return sumA == key.sumA &&
+					sumB == key.sumB &&
+					index == key.index;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(sumA, sumB, index);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int minSwaps(int[] arr) {
+
+		int sum = 0;
+		for (int i = 0; i < arr.length; i++)
+			sum += arr[i];
+
+		return minSwaps(arr, sum, 0, 0);
+	}
+
+	//take from A and give to B
+	private static int minSwaps(int[] arr, int sumA, int sumB, int index) {
+
+		//nothing to do
+		if (index == arr.length)
+			return abs(sumA - sumB);
+
+		Key key = new Key(sumA, sumB, index);
+
+		if (MEMO.containsKey(key))
+			return MEMO.get(key);
+
+		int element = arr[index];
+
+		//either give this element to B or not
+		int newSumA = sumA - element;
+		int newSumB = sumB + element;
+
+		int minA = minSwaps(arr, newSumA, newSumB, index + 1);
+		int minB = minSwaps(arr, sumA, sumB, index + 1);
+
+
+		int toReturn = Integer.min(minA, minB);
+		MEMO.put(key, toReturn);
+		return toReturn;
+	}
+
+	private static int abs(int a) {
+		return a < 0 ? -a : a;
+	}
