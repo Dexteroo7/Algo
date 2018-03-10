@@ -1,0 +1,22 @@
+https://practice.geeksforgeeks.org/problems/count-number-of-hops/0
+
+private static final Map<Integer, Integer> MEMO = new HashMap<>();
+
+	private static int ways(int distance) {
+
+		if (distance < 0)
+			return 0;
+		if (distance == 0)
+			return 1;
+
+		if (MEMO.containsKey(distance))
+			return MEMO.get(distance);
+
+		int take1 = ways(distance - 1);
+		int take2 = ways(distance - 2);
+		int take3 = ways(distance - 3);
+
+		MEMO.put(distance, take1 + take2 + take3);
+
+		return take1 + take2 + take3;
+	}
