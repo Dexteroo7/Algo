@@ -1,0 +1,129 @@
+https://practice.geeksforgeeks.org/problems/word-break/0
+
+	private static final class Trie {
+
+		final char trieChar;
+		final Map<Character, Trie> children = new HashMap<>();
+		final List<String> completedWord = new ArrayList<>();
+
+		Trie failure = null;
+
+		private Trie(char trieChar) {
+			this.trieChar = trieChar;
+		}
+
+		//create the trie if required
+		public Trie addChild(char aChar) {
+			return children.computeIfAbsent(aChar, na -> new Trie(aChar));
+		}
+
+		public void markWordEnd(String word) {
+			this.completedWord.add(word);
+		}
+
+		public void setFailure(Trie failure) {
+			this.failure = failure;
+		}
+
+		public boolean isFailureSet() {
+			return this.failure != null;
+		}
+	}
+
+	private static final class Aho {
+
+		private final String[] words;
+		private final Trie root;
+
+		private Aho(String[] words) {
+
+			this.words = words;
+			this.root = new Trie('\r');
+			initialize();
+			buildFailureStates();
+		}
+
+		private void initialize() {
+
+			for (String word : words) {
+
+				Trie current = root;
+
+				for (int i = 0; i < word.length(); i++) {
+
+					char currentChar = word.charAt(i);
+					current = current.addChild(currentChar);
+				}
+
+				current.markWordEnd(word);
+			}
+
+			//failure of children of root is root
+			for (Trie trie : root.children.values())
+				trie.setFailure(root);
+		}
+
+		private void buildFailureStates() {
+
+			Queue<Trie> bfsHelper = new ArrayDeque<>();
+			bfsHelper.offer(root);
+
+			while (!bfsHelper.isEmpty()) {
+
+				//will have failure state set
+				Trie trie = bfsHelper.poll();
+
+				for (Trie child : trie.children.values()) {
+
+					//add the children so that we can proceed in bfs fashion
+					bfsHelper.add(child);
+					if (child.isFailureSet())
+						continue;
+
+					Trie failure = trie.failure;
+					while (failure != null && !failure.children.containsKey(child.trieChar))
+						failure = failure.failure;
+					if (failure == null)
+						failure = root;
+					else
+						failure = failure.children.get(child.trieChar);
+
+					child.failure = failure;
+				}
+			}
+		}
+
+		public boolean isContained(String text) {
+
+			boolean[] check = new boolean[text.length()];
+			Trie current = root;
+
+			for (int i = 0; i < text.length(); i++) {
+
+				char character = text.charAt(i);
+				while (!current.children.containsKey(character) && current != root)
+					current = current.failure;
+				current = current.children.get(character);
+
+				Trie pointer = current;
+				while (pointer != root && pointer != null) {
+					if (!pointer.completedWord.isEmpty()) {
+
+						for (String completedWord : pointer.completedWord) {
+							Arrays.fill(check, i - completedWord.length() + 1, i + 1, true);
+						}
+					}
+					pointer = pointer.failure;
+				}
+
+				if (current == null)
+					current = root;
+			}
+
+			for (int i = 0; i < check.length; i++) {
+				if (!check[i])
+					return false;
+			}
+			return true;
+		}
+	}
