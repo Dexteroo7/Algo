@@ -1,0 +1,68 @@
+https://practice.geeksforgeeks.org/problems/number-of-coins/0
+
+private static final class Key {
+
+		final int amount, index;
+
+		private Key(int amount, int index) {
+			this.amount = amount;
+			this.index = index;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return amount == key.amount &&
+					index == key.index;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(amount, index);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int minWays(int amount, int[] denoms) {
+
+		return minWays(amount, denoms, 0);
+	}
+
+	private static int minWays(int amount, int[] denoms, int index) {
+
+		if (amount < 0)
+			return -1;
+		if (amount == 0)
+			return 0;
+		if (index == denoms.length)
+			return -1;
+
+		Key key = new Key(amount, index);
+		Integer fromMemo = MEMO.get(key);
+		if (fromMemo != null)
+			return fromMemo;
+
+		//take or not take
+		int take = minWays(amount - denoms[index], denoms, index);
+		int notTake = minWays(amount, denoms, index + 1);
+
+		int min;
+
+		if (take == -1 && notTake == -1)
+			min = -1;
+		else if (take == -1)
+			min = notTake;
+		else if (notTake == -1)
+			min = take + 1;
+		else
+			min = Integer.min(take + 1, notTake);
+
+		MEMO.put(key, min);
+		return min;
+	}
