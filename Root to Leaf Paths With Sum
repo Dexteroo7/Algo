@@ -1,0 +1,46 @@
+https://www.interviewbit.com/problems/root-to-leaf-paths-with-sum/
+
+	private static final class TreeNode {
+
+		int val;
+		TreeNode left;
+		TreeNode right;
+
+		TreeNode(int x) {
+			val = x;
+			left = null;
+			right = null;
+		}
+	}
+
+	private static final ArrayList<ArrayList<Integer>> ANSWER = new ArrayList<>();
+
+	public static ArrayList<ArrayList<Integer>> pathSum(TreeNode treeNode, int requiredSum) {
+
+		ANSWER.clear();
+
+		//null or no children
+		if (treeNode == null || (treeNode.left == null && treeNode.right == null))
+			return ANSWER;
+
+		pathSumChild(treeNode, requiredSum, new ArrayList<>());
+		return ANSWER;
+	}
+
+	public static void pathSumChild(TreeNode treeNode, int requiredSum, ArrayList<Integer> onGoing) {
+
+		if (treeNode == null)
+			return;
+
+		onGoing.add(treeNode.val);
+
+		//reached leaf
+		if (treeNode.left == null && treeNode.right == null) {
+			if (requiredSum == treeNode.val)
+				ANSWER.add(onGoing);
+			return;
+		}
+
+		pathSumChild(treeNode.left, requiredSum - treeNode.val, new ArrayList<>(onGoing));
+		pathSumChild(treeNode.right, requiredSum - treeNode.val, new ArrayList<>(onGoing));
+	}
