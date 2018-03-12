@@ -1,0 +1,44 @@
+https://www.interviewbit.com/problems/painters-partition-problem/
+
+	public static int paint(int numberOfPainter, int timeTakenPerUnit, int[] units) {
+
+		long maxTime = IntStream.of(units).sum();
+
+		long high = maxTime;
+		long low = 0;
+
+		long res = maxTime;
+
+		while (low <= high) {
+
+			//if it possible to do in this much time ?
+			long mid = (low + high) / 2;
+			boolean possible = isPossible(numberOfPainter, units, mid);
+			if (possible) {
+				high = mid - 1;
+				res = mid;
+			} else
+				low = mid + 1;
+		}
+
+		return (int) ((res * timeTakenPerUnit) % 10000003);
+	}
+
+	public static boolean isPossible(int numberOfPainter, int[] units, long time) {
+
+		int totalBoards = units.length;
+		int boardIndex = 0;
+
+		for (int i = 0; i < numberOfPainter & boardIndex < totalBoards; i++) {
+
+			int timeTaken = 0;
+			while (boardIndex < totalBoards) {
+				timeTaken += units[boardIndex];
+				if (timeTaken > time)
+					break;
+				boardIndex++;
+			}
+		}
+
+		return boardIndex == totalBoards;
+	}
