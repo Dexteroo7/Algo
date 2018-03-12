@@ -1,0 +1,38 @@
+https://www.interviewbit.com/problems/bst-iterator/
+
+public class Solution {
+
+	private final Stack<Object> stack = new Stack<>();
+
+    public Solution(TreeNode root) {
+        if(root != null)
+            stack.push(root);
+    }
+
+	public boolean hasNext() {
+		return !stack.isEmpty();
+	}
+
+	public int next() {
+
+		while (!stack.isEmpty()) {
+
+			Object current = stack.pop();
+			if (current == null)
+				continue;
+			if (current instanceof TreeNode) {
+
+				if (((TreeNode) current).right != null)
+					stack.push(((TreeNode) current).right);
+				stack.push(((TreeNode) current).val);
+				if (((TreeNode) current).left != null)
+					stack.push(((TreeNode) current).left);
+					
+			} else {
+				return  (Integer) current;
+			}
+		}
+		
+		return -1;
+	}
+}
