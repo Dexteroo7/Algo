@@ -1,0 +1,81 @@
+https://practice.geeksforgeeks.org/problems/maximum-sum-increasing-subsequence/0
+
+	private static final class Key {
+
+		final int index, lastSeen;
+
+		private Key(int index, int lastSeen) {
+			this.index = index;
+			this.lastSeen = lastSeen;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return index == key.index &&
+					lastSeen == key.lastSeen;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(index, lastSeen);
+		}
+	}
+
+	private static int maxSumSubSequence(int[] arr) {
+
+		return maxSumSubSequence(arr, 0, Integer.MIN_VALUE);
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int maxSumSubSequence(int[] arr, int index, int lastSeen) {
+
+		if (index == arr.length)
+			return 0;
+
+		Key key = new Key(index, lastSeen);
+		Integer max = MEMO.get(key);
+		if (max != null)
+			return max;
+
+		int current = arr[index];
+
+		int take, notTake;
+		if (current > lastSeen) {
+
+			//either take or not take
+			take = current + maxSumSubSequence(arr, index + 1, current);
+			notTake = maxSumSubSequence(arr, index + 1, lastSeen);
+
+		} else {
+			take = 0;
+			notTake = maxSumSubSequence(arr, index + 1, lastSeen);
+		}
+
+		max = Integer.max(take, notTake);
+		MEMO.put(key, max);
+		return max;
+	}
+
+	public static void main(String[] args) throws IOException {
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		int testCases = Integer.parseInt(input.readLine());
+
+		for (int i = 0; i < testCases; i++) {
+
+			int elements = Integer.parseInt(input.readLine());
+			StringTokenizer tokenizer = new StringTokenizer(input.readLine());
+			int[] arr = new int[elements];
+			for (int j = 0; j < elements; j++)
+				arr[j] = Integer.parseInt(tokenizer.nextToken());
+			System.out.println(maxSumSubSequence(arr));
+			MEMO.clear();
+		}
+	}
