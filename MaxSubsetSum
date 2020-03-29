@@ -1,0 +1,42 @@
+import static java.lang.Integer.max;
+
+//https://www.hackerrank.com/challenges/max-array-sum
+public class Solution {
+
+    static int maxSubsetSum(int[] arr) {
+
+        if (arr.length == 1)
+            return arr[0];
+        if (arr.length == 2)
+            return max(arr[0], arr[1]);
+
+        int maxPP = arr[0];
+        int maxP = arr[1];
+        int max = max(maxP, maxPP);
+
+        for (int i = 2; i < arr.length; i++) {
+
+//            System.out.printf("%d, %d, %d%n", max, maxP, maxPP);
+
+            int take = maxPP + arr[i];
+
+            maxPP = max(maxPP, maxP);
+            maxP = max(arr[i], take);
+
+            max = max(max, max(maxP, maxPP));
+        }
+
+        return max;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(maxSubsetSum(new int[]{0}));
+        System.out.println(maxSubsetSum(new int[]{-1}));
+        System.out.println(maxSubsetSum(new int[]{-1, 0}));
+
+        System.out.println(maxSubsetSum(new int[]{1, 2, 3, 4, 5}));
+        System.out.println(maxSubsetSum(new int[]{-2, 1, 3, -4, 5}));
+        System.out.println(maxSubsetSum(new int[]{3, 5, -7, 8, 10}));
+    }
+}
