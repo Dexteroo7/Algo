@@ -1,4 +1,4 @@
-/*package whatever //do not write package name here */
+package Graphs;/*package whatever //do not write package name here */
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-//https://www.hackerrank.com/contests/data-structure-tasks-binary-tree-union-find/challenges/connected-componentpublic
+package Graphs;//https://www.hackerrank.com/contests/data-structure-tasks-binary-tree-union-find/challenges/connected-componentpublic
 
 
 import java.io.*;

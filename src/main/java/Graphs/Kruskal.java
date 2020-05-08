@@ -1,10 +1,57 @@
+package Graphs;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class Solution {
+public class Kruskal {
+
+    final KruskalNode[] nodes;
+
+    private Kruskal(int count) {
+        this.nodes = new KruskalNode[count + 1];
+        for (int i = 0; i < nodes.length; i++) {
+            this.nodes[i] = new KruskalNode(i, 0, 0);
+        }
+    }
+
+    public int findParent(int id) {
+        int parent = nodes[id].parent;
+        if (parent == 0)
+            return id;
+        //with path compression
+        return nodes[id].parent = findParent(nodes[id].parent);
+    }
+
+    public void union(int id1, int id2) {
+
+        KruskalNode node1 = nodes[id1];
+        KruskalNode node2 = nodes[id2];
+
+        if (node1.rank > node2.rank)
+            node2.parent = node1.id;
+        else if (node2.rank > node1.rank)
+            node1.parent = node2.id;
+        else {
+            node2.parent = node1.id;
+            node1.rank++;
+        }
+    }
+
+    private static final class KruskalNode {
+
+        public KruskalNode(int id, int parent, int rank) {
+            this.id = id;
+            this.parent = parent;
+            this.rank = rank;
+        }
+
+        final int id;
+        int parent;
+        int rank;
+    }
 
     private static final class Edge {
 
@@ -18,59 +65,33 @@ public class Solution {
         }
     }
 
-    /*
-     * Complete the 'kruskals' function below.
-     *
-     * The function is expected to return an INTEGER.
-     * The function accepts WEIGHTED_INTEGER_GRAPH g as parameter.
-     */
-
-    /*
-     * For the weighted graph, <name>:
-     *
-     * 1. The number of nodes is <name>Nodes.
-     * 2. The number of edges is <name>Edges.
-     * 3. An edge exists between <name>From[i] and <name>To[i]. The weight of the edge is <name>Weight[i].
-     *
-     */
-
     public static int kruskals(int gNodes, List<Integer> gFrom, List<Integer> gTo, List<Integer> gWeight) {
 
-        BitSet visited = new BitSet(gNodes);
-
-        PriorityQueue<Edge> edges = new PriorityQueue<>(Comparator.<Edge>comparingInt(x -> x.weight)
-                .thenComparingInt(x -> x.to + x.from + x.weight));
-        Map<Integer, List<Integer>> adjacency = new HashMap<>();
-
+        PriorityQueue<Edge> edges = new PriorityQueue<>(Comparator.comparingInt(x -> x.weight));
         for (int i = 0; i < gFrom.size(); i++) {
-
-            Edge edge = new Edge(gFrom.get(i), gTo.get(i), gWeight.get(i));
-            edges.add(edge);
-
-            adjacency.computeIfAbsent(gFrom.get(i), na -> new ArrayList<>()).add(gTo.get(i));
-            adjacency.computeIfAbsent(gTo.get(i), na -> new ArrayList<>()).add(gFrom.get(i));
+            edges.add(new Edge(gFrom.get(i), gTo.get(i), gWeight.get(i)));
         }
 
         int weight = 0;
-        while (!edges.isEmpty()) {
+        int expectedEdges = gNodes - 1;
+        int edgeCount = 0;
+        Kruskal kruskal = new Kruskal(gNodes);
+        while (edgeCount < expectedEdges) {
 
-            Edge current = edges.poll();
-            //skip is overlap
-            if (visited.get(current.from) && visited.get(current.to))
-                continue;
-
-            visited.set(current.from);
-            visited.set(current.to);
-            weight += current.weight;
+            Edge toAdd = edges.poll();
+            int a = toAdd.from;
+            int b = toAdd.to;
+            int parentA = kruskal.findParent(a);
+            int parentB = kruskal.findParent(b);
+            //do not add this edge as it forms a cycle
+            if (parentA != parentB) {
+                weight += toAdd.weight;
+                kruskal.union(parentA, parentB);
+                edgeCount++;
+            }
         }
 
-        //all visited ?
-        //return weight ?
-        int i = visited.nextClearBit(1);
-        if (i > gNodes)
-            return weight;
-        else
-            return -1;
+        return weight;
     }
 
     public static void main(String[] args) throws IOException {

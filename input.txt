@@ -1,11 +1,8 @@
-+
-R+
-RL-
-RR/
-RRL+
-L1
-RLL4
-RLR8
-RRLL4
-RRLR9
-RRR2
+7 7
+4 1
+4 5
+4 6
+1 2
+2 3
+5 3
+6 7

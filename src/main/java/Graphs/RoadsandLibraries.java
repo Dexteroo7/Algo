@@ -1,3 +1,5 @@
+package Graphs;
+
 import java.io.*;
 import java.math.*;
 import java.net.HttpURLConnection;
