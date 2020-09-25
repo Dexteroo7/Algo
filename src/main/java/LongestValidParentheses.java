@@ -3,6 +3,36 @@ import java.util.regex.Pattern;
 
 class LongestValidParentheses {
 
+    public int longestValidParentheses2(String input) {
+
+        int max = 0;
+
+        int count = 0;
+        int closed = 0;
+        int open = 0;
+        for (int i = 0; i < input.length(); i++) {
+
+            char current = input.charAt(i);
+            if (current == ')') {
+                count--;
+                closed++;
+            } else if (current == '(') {
+                count++;
+                open++;
+            }
+
+            //reset
+            if (count < 0) {
+                count = 0;
+                closed = 0;
+                open = 0;
+            } else {
+                max = Integer.max(max, 2 * closed);
+            }
+        }
+        return max;
+    }
+
     public static int longestValidParentheses(String toCheck) {
 
         System.out.println(toCheck.length() + ", length");
