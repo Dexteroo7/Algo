@@ -1,4 +1,4 @@
-package Graphs;
+package graph;
 
 import java.util.ArrayList;
 import java.util.BitSet;

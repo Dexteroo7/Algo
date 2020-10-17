@@ -1,14 +1,9 @@
-package Graphs;
+package graph;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.BiConsumer;
-
-import static java.util.stream.Collectors.*;
 
 public class Lonely_Island {
 

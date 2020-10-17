@@ -1,9 +1,7 @@
-package Graphs;//https://www.hackerrank.com/contests/data-structure-tasks-binary-tree-union-find/challenges/connected-componentpublic
+package graph;//https://www.hackerrank.com/contests/data-structure-tasks-binary-tree-union-find/challenges/connected-componentpublic
 
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class DetectCycleUnionFind {

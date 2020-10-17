@@ -1,4 +1,4 @@
-package Graphs;
+package graph;
 
 import java.io.FileInputStream;
 import java.io.IOException;

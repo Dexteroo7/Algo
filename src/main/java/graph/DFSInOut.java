@@ -1,4 +1,4 @@
-package Graphs;
+package graph;
 
 import java.io.*;
 import java.nio.file.Files;
