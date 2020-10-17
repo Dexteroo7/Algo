@@ -2,6 +2,7 @@ package graph.topologicalsort;
 
 import java.util.*;
 
+//https://leetcode.com/problems/course-schedule/
 class Course_schedule {
     public static boolean canFinish(int numCourses, int[][] prerequisites) {
 

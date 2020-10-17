@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 class Course_Schedule_3 {
 
@@ -21,32 +22,20 @@ class Course_Schedule_3 {
             courseList.add(new Course(cours[0], cours[1]));
         }
 
-        courseList.sort(Comparator.comparingInt(x -> x.deadline));
-        return scheduleCourse(courseList, 0, 0);
-    }
+        //sort by deadline
+        courseList.sort(Comparator.<Course>comparingInt(x -> x.deadline)
+                .thenComparingInt(x -> x.duration));
 
-    public int scheduleCourse(List<Course> courses, int index, int timeLine) {
+        int timeLine = 0;
+        PriorityQueue<Course> taken = new PriorityQueue<>(Comparator.<Course>comparingInt(x -> x.duration).reversed());
+        for (Course course : courseList) {
 
-        if (index >= courses.size())
-            return 0;
+            timeLine += course.duration;
+            taken.add(course);
+            if (timeLine > course.deadline)
+                timeLine -= taken.poll().duration;
+        }
 
-        Course current = courses.get(index);
-        if (timeLine + current.duration > current.deadline)
-            return scheduleCourse(courses, index + 1, timeLine);
-
-        //either do this course, or dont do this course
-        int ansDo = 1 + scheduleCourse(courses, index + 1, timeLine + current.duration);
-        int ansDont = scheduleCourse(courses, index + 1, timeLine);
-
-        return Integer.max(ansDo, ansDont);
-    }
-
-    public static void main(String[] args) {
-
-        Course_Schedule_3 solution = new Course_Schedule_3();
-        System.out.println(solution.scheduleCourse(new int[][]{new int[]{2, 5},
-                new int[]{2, 19},
-                new int[]{1, 8},
-                new int[]{1, 3}}));
+        return taken.size();
     }
 }
