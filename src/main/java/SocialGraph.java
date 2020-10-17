@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class SocialGraphTODO {
+public class SocialGraph {
 
     private static final class SocialMember implements Comparable<SocialMember> {
 
