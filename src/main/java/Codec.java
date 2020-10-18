@@ -5,7 +5,9 @@ import java.util.*;
  */
 public class Codec {
 
-    static char NULL_SENTINEL = '\uffff';
+    static char NULL = Character.MAX_VALUE;
+    static char LEAF = Character.MAX_VALUE - 1;
+    static TreeNode LEAF_SENTINEL = new TreeNode(Character.MAX_VALUE - 1);
 
     public static class TreeNode {
         int val;
@@ -97,14 +99,22 @@ public class Codec {
         while (!queue.isEmpty()) {
 
             TreeNode current = queue.poll();
+            if (current == LEAF_SENTINEL) {
+                builder.append(LEAF);
+                continue;
+            }
             if (current == null) {
-                builder.append(NULL_SENTINEL);
+                builder.append(NULL);
                 continue;
             }
 
             builder.append(mapToChar(current.val));
-            queue.add(current.left);
-            queue.add(current.right);
+            if (current.left == null && current.right == null) {
+                queue.add(LEAF_SENTINEL);
+            } else {
+                queue.add(current.left);
+                queue.add(current.right);
+            }
         }
 
         return builder.toString();
@@ -125,14 +135,16 @@ public class Codec {
         int arrayIndex = 1;
         while (!queue.isEmpty()) {
             TreeNode current = queue.poll();
-            Integer currentLeft = mapFromChar(data.charAt(arrayIndex++));
-            if (currentLeft != null) {
-                current.left = new TreeNode(currentLeft);
+            char value = data.charAt(arrayIndex++);
+            if (value == LEAF)
+                continue;
+            if (value != NULL) {
+                current.left = new TreeNode(mapFromChar(value));
                 queue.add(current.left);
             }
-            Integer currentRight = mapFromChar(data.charAt(arrayIndex++));
-            if (currentRight != null) {
-                current.right = new TreeNode(currentRight);
+            value = data.charAt(arrayIndex++);
+            if (value != NULL) {
+                current.right = new TreeNode(mapFromChar(value));
                 queue.add(current.right);
             }
         }
@@ -142,14 +154,26 @@ public class Codec {
     private static char mapToChar(Integer toMap) {
 
         //value can range from -1000 to +1000
-        return toMap == null ? NULL_SENTINEL : (char) (toMap + 1000);
+        return toMap == null ? NULL : (char) (toMap + 1000);
     }
 
     private static Integer mapFromChar(char toMap) {
 
-        if (toMap == NULL_SENTINEL)
+        if (toMap == NULL)
             return null;
         else
             return toMap - 1000;
+    }
+
+    public static void main(String[] args) {
+
+        TreeNode node = new TreeNode(10);
+        node.left = new TreeNode(1);
+        node.left.right = new TreeNode(2);
+        node.left.left = new TreeNode(3);
+
+        String s = serializeUsingLevel(node);
+        TreeNode node1 = deserializeUsingLevel(s);
+        node1.equals(node);
     }
 }
