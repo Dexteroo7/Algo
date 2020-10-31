@@ -7,7 +7,6 @@ class LRUCache {
 
         //sentinel values
         KeyValue left = new KeyValue(-1, -1), right = new KeyValue(-1, -1);
-
         {
             left.next = right;
             right.prev = left;
@@ -24,6 +23,9 @@ class LRUCache {
 
         public KeyValue popLeft() {
 
+            //nothing to pop
+            if (left.next == right)
+                return null;
             KeyValue toPop = left.next;
             toPop.unlink();
             return toPop;
