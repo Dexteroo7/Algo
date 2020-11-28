@@ -1,74 +1,87 @@
-package graph;/*package whatever //do not write package name here */
+package graph;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 class Djikstra {
 
-    private static final Map<Integer, Integer> DESTINATION_MAP = new HashMap<>();
+    private static final class Node {
 
-    static {
-        DESTINATION_MAP.put(1, 0);
+        final String nodeId;
+        int destinationFromStart;
 
-        PriorityQueue<Node> djikstraQueue = new PriorityQueue<>();
-        djikstraQueue.add(new Node(1, 0));
-
-        while (!djikstraQueue.isEmpty()) {
-
-            Node current = djikstraQueue.remove();
-            if (current.nodeId > 10000)
-                continue;
-
-            Node nextNodeA = new Node(current.nodeId * 3, 1 + current.destinationFromStart);
-            Node nextNodeB = new Node(current.nodeId + 1, 1 + current.destinationFromStart);
-            //update destination if it is minimum
-            DESTINATION_MAP.compute(nextNodeA.nodeId, (key, value) -> {
-                if (value == null) {
-                    djikstraQueue.add(nextNodeA);
-                    return nextNodeA.destinationFromStart;
-                }
-                return Integer.min(value, nextNodeA.destinationFromStart);
-            });
-            DESTINATION_MAP.compute(nextNodeB.nodeId, (key, value) -> {
-                if (value == null) {
-                    djikstraQueue.add(nextNodeB);
-                    return nextNodeB.destinationFromStart;
-                }
-                return Integer.min(value, nextNodeB.destinationFromStart);
-            });
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        //code
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-
-            int testCases = Integer.parseInt(reader.readLine().trim());
-            for (int cases = testCases; cases > 0; cases--) {
-
-                int n = Integer.parseInt(reader.readLine());
-                int shortestPath = DESTINATION_MAP.get(n);
-                System.out.println(shortestPath);
-            }
-        }
-    }
-
-
-    private static final class Node implements Comparable<Node> {
-
-        final int nodeId, destinationFromStart;
-
-        private Node(int nodeId, int destinationFromStart) {
+        private Node(String nodeId, int destinationFromStart) {
             this.nodeId = nodeId;
             this.destinationFromStart = destinationFromStart;
         }
+    }
 
-        @Override
-        public int compareTo(Node o) {
-            return Integer.compare(this.destinationFromStart, o.destinationFromStart);
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+
+        if (beginWord.equals(endWord))
+            return 0;
+
+        Map<String, List<String>> wordGraph = new HashMap<>();
+
+        for (int i = 0; i < wordList.size(); i++) {
+
+            if (distance1(beginWord, wordList.get(i))) {
+                wordGraph.computeIfAbsent(beginWord, na -> new ArrayList<>()).add(wordList.get(i));
+                wordGraph.computeIfAbsent(wordList.get(i), na -> new ArrayList<>()).add(beginWord);
+            }
+
+            for (int j = i + 1; j < wordList.size(); j++) {
+                if (distance1(wordList.get(i), wordList.get(j))) {
+                    wordGraph.computeIfAbsent(wordList.get(i), na -> new ArrayList<>()).add(wordList.get(j));
+                    wordGraph.computeIfAbsent(wordList.get(j), na -> new ArrayList<>()).add(wordList.get(i));
+                }
+            }
         }
+
+        if (!wordGraph.containsKey(endWord))
+            return 0;
+
+        Map<String, Node> nodes = new HashMap<>();
+        PriorityQueue<Node> djikstraQueue = new PriorityQueue<>(Comparator.comparingInt(x -> x.destinationFromStart));
+        Set<String> visitedNodes = new HashSet<>();
+        djikstraQueue.add(new Node(beginWord, 0));
+        nodes.put(beginWord, new Node(beginWord, 0));
+
+        int minDistance = Integer.MAX_VALUE;
+        while (!djikstraQueue.isEmpty()) {
+
+            Node current = djikstraQueue.poll();
+            if (visitedNodes.contains(current.nodeId))
+                continue;
+            visitedNodes.add(current.nodeId);
+
+            if (current.nodeId.equals(endWord))
+                minDistance = Integer.min(minDistance, current.destinationFromStart);
+
+            for (String s : wordGraph.getOrDefault(current.nodeId, Collections.emptyList())) {
+
+                Node node = nodes.computeIfAbsent(s, na -> new Node(s, 1 + current.destinationFromStart));
+                node.destinationFromStart = Integer.min(node.destinationFromStart, 1 + current.destinationFromStart);
+                djikstraQueue.add(node);
+            }
+        }
+
+        if (minDistance == Integer.MAX_VALUE)
+            return 0;
+
+        return minDistance + 1;
+    }
+
+    public boolean distance1(String a, String b) {
+
+        boolean diff1 = false;
+        for (int i = 0; i < a.length(); i++) {
+            if (a.charAt(i) != b.charAt(i)) {
+                if (diff1)
+                    return false;
+                diff1 = true;
+            }
+        }
+
+        return diff1;
     }
 }
