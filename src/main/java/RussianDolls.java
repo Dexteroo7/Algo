@@ -6,7 +6,6 @@ import java.util.Arrays;
 //https://leetcode.com/problems/russian-doll-envelopes/
 class RussianDolls {
 
-
     public int maxEnvelopes(int[][] envelopes) {
 
         if (envelopes == null || envelopes.length == 0)
@@ -35,8 +34,7 @@ class RussianDolls {
 
         return len;
     }
-
-
+    
     public static void main(String[] args) throws IOException {
 
         String input = Files.readAllLines(Paths.get("input.txt")).get(0);
