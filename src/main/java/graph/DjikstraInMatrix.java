@@ -40,7 +40,8 @@ class DjikstraInMatrix {
                     new int[]{current[0], current[1] + 1},
                     new int[]{current[0] + 1, current[1]},
                     new int[]{current[0] + 1, current[1] - 1},
-                    new int[]{current[0] + 1, current[1] + 1})) {//ignore out of bounds
+                    new int[]{current[0] + 1, current[1] + 1})) {
+                //ignore out of bounds
                 if (neighbour[0] < 0 || neighbour[0] >= grid.length || neighbour[1] < 0 || neighbour[1] >= grid[neighbour[0]].length)
                     continue;
                 //ignore barrier
