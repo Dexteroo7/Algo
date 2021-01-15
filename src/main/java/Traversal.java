@@ -1,10 +1,8 @@
-import com.google.common.io.Files;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Consumer;
 
 class Traversal {
 
@@ -40,7 +38,7 @@ class Traversal {
 
     public static void main(String[] args) throws IOException {
 
-        List<String> input = Files.readLines(new File("input.txt"), Charset.defaultCharset());
+        List<String> input = Files.readAllLines(Paths.get("input.txt"), Charset.defaultCharset());
         String[] s = input.get(0).split(" ");
         int nodes = Integer.parseInt(s[0]);
         int edges = Integer.parseInt(s[1]);
