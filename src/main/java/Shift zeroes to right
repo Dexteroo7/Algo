@@ -1,0 +1,36 @@
+	public static void main(String[] args) {
+
+		Scanner in = new Scanner(System.in);
+		int testCases = in.nextInt();
+
+		for (int i = 0; i < testCases; i++) {
+
+			int arrLength = in.nextInt();
+			int[] arr = new int[arrLength];
+			for (int i1 = 0; i1 < arrLength; i1++) {
+				arr[i1] = in.nextInt();
+			}
+
+			arr = shiftZeroesToRight(arr);
+			IntStream.of(arr).forEach(gg -> System.out.print(gg + " "));
+			System.out.println();
+		}
+	}
+
+	private static int[] shiftZeroesToRight(int[] arr) {
+
+		int rightPointer = arr.length - 1;
+
+		for (int leftPointer = 0; leftPointer < rightPointer; leftPointer++) {
+
+			while (arr[rightPointer] == 0)
+				rightPointer--;
+			if (arr[leftPointer] == 0) {
+				arr[leftPointer] = arr[rightPointer];
+				arr[rightPointer] = 0;
+				rightPointer--;
+			}
+		}
+
+		return arr;
+	}

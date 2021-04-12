@@ -1,0 +1,38 @@
+https://app.codility.com/programmers/lessons/14-binary_search_algorithm/min_max_division/
+
+	//check weather given maxSum, satisfies maxBlockSize
+	private static boolean verifyBlockSize(int maxSum, int maxBlockSize, int[] arr) {
+
+		int runningSum = 0;
+		int blocksUsed = 1;
+		for (int index = 0; index < arr.length; index++) {
+
+			int element = arr[index];
+			if (element + runningSum > maxSum) {
+				blocksUsed++;
+				runningSum = element;
+			} else
+				runningSum += element;
+			if (blocksUsed > maxBlockSize)
+				return false;
+		}
+		return true;
+	}
+
+	public static int solutionB(int blocks, int max, int[] arr) {
+
+		int lowerBound = IntStream.of(arr).max().getAsInt();
+		int upperBound = IntStream.of(arr).sum();
+
+		while (lowerBound <= upperBound) {
+
+			int candidateSum = (lowerBound + upperBound) / 2;
+			//if maxSum is valid, try with a lower maxSum, else higher maxSum
+			if (verifyBlockSize(candidateSum, blocks, arr))
+				upperBound = candidateSum - 1;
+			else
+				lowerBound = candidateSum + 1;
+		}
+
+		return lowerBound;
+	}

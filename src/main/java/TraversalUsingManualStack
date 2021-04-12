@@ -1,0 +1,24 @@
+public ArrayList<Integer> preorderTraversal(TreeNode A) {
+
+		ArrayList<Integer> toReturn = new ArrayList<>();
+		Stack<Object> stack = new Stack<>();
+		stack.push(A);
+
+		while (!stack.isEmpty()) {
+
+			Object current = stack.pop();
+			if (current == null)
+				continue;
+			if (current instanceof TreeNode) {
+
+        //vary the order for others
+				stack.push(((TreeNode) current).right);
+				stack.push(((TreeNode) current).left);
+				stack.push(((TreeNode) current).val);
+
+			} else
+				toReturn.add((Integer) current);
+		}
+
+		return toReturn;
+	}

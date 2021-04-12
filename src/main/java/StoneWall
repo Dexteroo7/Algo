@@ -1,0 +1,39 @@
+https://app.codility.com/programmers/lessons/7-stacks_and_queues/stone_wall/
+
+	public static int solution(int[] heights) {
+
+		if (heights.length < 2)
+			return 1;
+
+		List<Integer> pastHeights = new ArrayList<>();
+
+		int requiredBlocks = 0;
+
+		int pastHeight = Integer.MIN_VALUE;
+		for (int requiredHeight : heights) {
+
+			if (requiredHeight == pastHeight)
+				continue;
+			else if (requiredHeight > pastHeight) {
+				pastHeights.add(pastHeight);
+				requiredBlocks++;
+			} else {
+
+				ListIterator<Integer> iterator = pastHeights.listIterator(pastHeights.size());
+				while (iterator.hasPrevious()) {
+
+					int height = iterator.previous();
+					if (height > requiredHeight)
+						iterator.remove();
+					if (height == requiredHeight)
+						break;
+					if (height < requiredHeight) {
+						requiredBlocks++;
+						break;
+					}
+				}
+			}
+			pastHeight = requiredHeight;
+		}
+		return requiredBlocks;
+	}

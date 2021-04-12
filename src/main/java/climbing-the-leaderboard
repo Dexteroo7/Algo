@@ -1,0 +1,22 @@
+https://www.hackerrank.com/challenges/climbing-the-leaderboard/problem
+
+    static int[] climbingLeaderboard(int[] scores, int[] alice) {
+
+        TreeMap<Integer, Integer> leaderBoard = new TreeMap<>();
+        final int[] counter = {1};
+        for (int score : scores) {
+            leaderBoard.computeIfAbsent(score, na -> counter[0]++);
+        }
+
+        for (int index = 0; index < alice.length; index++) {
+
+            int score = alice[index];
+            Map.Entry<Integer, Integer> higher = leaderBoard.higherEntry(score);
+            if (higher == null)
+                alice[index] = 1;
+            else
+                alice[index] = higher.getValue() + 1;
+        }
+
+        return alice;
+    }

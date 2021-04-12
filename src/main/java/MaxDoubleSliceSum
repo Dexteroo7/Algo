@@ -1,0 +1,47 @@
+
+//https://codility.com/programmers/task/max_double_slice_sum/
+	public static int solution(int... values) {
+
+		if (values.length < 4)
+			return 0;
+
+		//max sum of slice ending at i
+		int[] maxEndingSums = new int[values.length];
+		maxEndingSums[0] = 0;
+		for (int index = 1; index < values.length - 1; index++) {
+
+			int previousMaxSum = maxEndingSums[index - 1];
+			int includingSum = previousMaxSum + values[index];
+			if (includingSum < 0)
+				maxEndingSums[index] = 0;
+			else
+				maxEndingSums[index] = includingSum;
+		}
+
+		//max sum of slice stating at i
+		int[] maxStartingSums = new int[values.length];
+		maxStartingSums[values.length - 1] = 0;
+		for (int index = values.length - 2; index >= 0; index--) {
+
+			int previousMaxSum = maxStartingSums[index + 1];
+			int includingSum = previousMaxSum + values[index];
+			if (includingSum < 0)
+				maxStartingSums[index] = 0;
+			else
+				maxStartingSums[index] = includingSum;
+		}
+
+		//move the pivot, calculating the the sums
+		int maxSum = 0;
+		for (int pivot = 1; pivot < values.length - 1; pivot++) {
+
+			//max sum of slice ending at pivot - 1
+			int sumA = maxEndingSums[pivot - 1];
+			//max sum of slice starting at pivot + 1
+			int sumB = maxStartingSums[pivot + 1];
+			if (sumA + sumB > maxSum)
+				maxSum = sumA + sumB;
+		}
+
+		return maxSum;
+	}

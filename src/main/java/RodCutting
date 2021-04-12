@@ -1,0 +1,64 @@
+https://practice.geeksforgeeks.org/problems/cutted-segments/0
+
+	private static final class Key {
+
+		final int length, index;
+
+		private Key(int length, int index) {
+			this.length = length;
+			this.index = index;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return length == key.length &&
+					index == key.index;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(length, index);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int maxCuts(int length, int[] arr) {
+
+		return maxCuts(length, arr, 0);
+	}
+
+	private static int maxCuts(int length, int[] arr, int index) {
+
+		if (length == 0)
+			return 0;
+		if (length < 0 || index == arr.length)
+			return -1;
+
+		Key key = new Key(length, index);
+		Integer maxWays = MEMO.get(key);
+		if (maxWays != null)
+			return maxWays;
+
+		int value = arr[index];
+		int take = maxCuts(length - value, arr, index);
+		int notTake = maxCuts(length, arr, index + 1);
+
+		if (take == -1 && notTake == -1)
+			maxWays = -1;
+		else if (take == -1)
+			maxWays = notTake;
+		else if (notTake == -1)
+			maxWays = take + 1;
+		else
+			maxWays = Integer.max(take + 1, notTake);
+
+		MEMO.put(key, maxWays);
+		return maxWays;
+	}

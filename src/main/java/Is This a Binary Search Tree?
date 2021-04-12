@@ -1,0 +1,31 @@
+https://www.hackerrank.com/challenges/is-binary-search-tree/problem
+
+	private static final class Node {
+
+		final int data;
+		Node left;
+		Node right;
+
+		private Node(int data) {
+			this.data = data;
+		}
+	}
+
+	public static boolean checkBST(Node root) {
+		return checkBST(root, Integer.MAX_VALUE, Integer.MIN_VALUE);
+	}
+
+	public static boolean checkBST(Node current, int max, int min) {
+
+		if (current == null) {
+			return true;
+		}
+
+		int currentData = current.data;
+		//data to left of current (including current) should be less than min
+		//data to right of current (including current) should be grater than max
+		return currentData < max &
+				currentData > min &
+				checkBST(current.left, Integer.min(currentData, max), min) &
+				checkBST(current.right, max, Integer.max(currentData, min));
+	}

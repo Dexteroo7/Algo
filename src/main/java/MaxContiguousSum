@@ -1,0 +1,11 @@
+https://practice.geeksforgeeks.org/problems/kadanes-algorithm/0
+
+static int maxContiguous(int[] arr) {
+
+		int max = Integer.MIN_VALUE, maxPrev = 0;
+
+		for (int element : arr)
+			max = max(maxPrev = max(element, element + maxPrev), max);
+
+		return max;
+}

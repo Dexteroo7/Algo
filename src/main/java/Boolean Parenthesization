@@ -1,0 +1,156 @@
+https://practice.geeksforgeeks.org/problems/boolean-parenthesization/0
+
+private static final class Key1 {
+
+		final CharSequence a, b;
+		final char symbol;
+		final boolean required;
+
+		public Key1(CharSequence a, CharSequence b, char symbol, boolean required) {
+			this.a = a;
+			this.b = b;
+			this.symbol = symbol;
+			this.required = required;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key1))
+				return false;
+			Key1 key1 = (Key1) o;
+			return symbol == key1.symbol &&
+					required == key1.required &&
+					Objects.equals(a, key1.a) &&
+					Objects.equals(b, key1.b);
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(a, b, symbol, required);
+		}
+	}
+
+	private static final class Key2 {
+
+		final CharSequence sequence;
+		final boolean required;
+
+		private Key2(CharSequence sequence, boolean required) {
+			this.sequence = sequence;
+			this.required = required;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key2))
+				return false;
+			Key2 key2 = (Key2) o;
+			return required == key2.required &&
+					Objects.equals(sequence, key2.sequence);
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(sequence, required);
+		}
+	}
+
+	private static final Map<Key1, Long> MEMO1 = new HashMap<>();
+	private static final Map<Key2, Long> MEMO2 = new HashMap<>();
+
+	private static long ways(CharSequence sequence, boolean required) {
+
+		//return 1 if this evaluates to 'required' (only 1 way)
+		if (sequence.length() == 1) {
+			return sequence.charAt(0) == 'T' ^ required ? 0 : 1;
+		}
+		if (sequence.length() == 3)
+			return required == evaluate(sequence.charAt(0), sequence.charAt(1), sequence.charAt(2)) ? 1 : 0;
+
+		Key2 key2 = new Key2(sequence, required);
+		Long ways = MEMO2.get(key2);
+		if (ways != null)
+			return ways;
+
+		ways = 0L;
+		for (int i = 1; i < sequence.length(); i += 2) {
+
+			CharSequence left = sequence.subSequence(0, i);
+			char symbol = sequence.charAt(i);
+			CharSequence right = sequence.subSequence(i + 1, sequence.length());
+			ways += ways(left, symbol, right, required);
+		}
+
+		MEMO2.put(key2, ways);
+		return ways;
+	}
+
+	private static long ways(CharSequence left, char symbol, CharSequence right, boolean required) {
+
+		Key1 key1 = new Key1(left, right, symbol, required);
+		Long ways = MEMO1.get(key1);
+		if (ways != null)
+			return ways;
+
+		ways = 0L;
+
+		if (symbol == '&') {
+
+			if (required) {
+				//both left and right need to be true
+				ways += ways(left, true) * ways(right, true);
+			} else {
+				//either
+				ways += ways(left, true) * ways(right, false);
+				ways += ways(left, false) * ways(right, true);
+				ways += ways(left, false) * ways(right, false);
+			}
+
+		} else if (symbol == '|') {
+
+			if (required) {
+				//either
+				ways += ways(left, true) * ways(right, false);
+				ways += ways(left, false) * ways(right, true);
+				ways += ways(left, true) * ways(right, true);
+			} else {
+				//both left and right need to be false
+				ways += ways(left, false) * ways(right, false);
+			}
+
+		} else {
+
+			if (required) {
+				ways += ways(left, true) * ways(right, false);
+				ways += ways(left, false) * ways(right, true);
+			} else {
+				ways += ways(left, true) * ways(right, true);
+				ways += ways(left, false) * ways(right, false);
+			}
+		}
+
+		MEMO1.put(key1, ways);
+		return ways;
+	}
+
+	private static boolean evaluate(char a, char symbol, char b) {
+
+		boolean A = a == 'T';
+		boolean B = b == 'T';
+
+		boolean toReturn;
+		if (symbol == '|')
+			toReturn = A | B;
+		else if (symbol == '&')
+			toReturn = A & B;
+		else
+			toReturn = A ^ B;
+
+		return toReturn;
+	}

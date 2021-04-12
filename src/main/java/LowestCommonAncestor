@@ -1,0 +1,63 @@
+https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-binary-tree/
+
+	private static final class Node {
+
+		int data;
+		Node left, right;
+
+		Node(int item) {
+			data = item;
+			left = right = null;
+		}
+	}
+
+	private static final class Found {
+
+		private final Node node;
+		private final int data;
+
+		private Found(Node node, int data) {
+			this.node = node;
+			this.data = data;
+		}
+	}
+
+	private Node LCA(Node current, int a, int b) {
+		Found found = find(current, a, b);
+		if (found != null)
+			return found.node;
+		else
+			return null;
+	}
+
+	private Found find(Node current, int a, int b) {
+
+		if (current == null)
+			return null;
+
+		//we found something
+		if (current.data == a)
+			return new Found(current, a);
+		if (current.data == b)
+			return new Found(current, b);
+
+		Found fromLeft = find(current.left, a, b);
+		Found fromRight = find(current.right, a, b);
+		if (fromLeft != null && fromLeft.data == -1)
+			return fromLeft;
+		if (fromRight != null && fromRight.data == -1)
+			return fromRight;
+
+		if (fromLeft != null && fromRight != null) {
+
+			if (fromLeft.data == a && fromRight.data == b)
+				//putting flag
+				return new Found(current, -1);
+			if (fromLeft.data == b && fromRight.data == a)
+				//putting flag
+				return new Found(current, -1);
+			return null;
+		}
+
+		return fromLeft == null ? fromRight : fromLeft;
+	}

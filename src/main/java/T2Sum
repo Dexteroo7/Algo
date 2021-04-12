@@ -1,0 +1,33 @@
+https://www.interviewbit.com/problems/2sum-binary-tree/#
+
+public static int t2Sum(TreeNode treeNode, int requiredSum) {
+
+		Set<Integer> seen = new HashSet<>();
+		Stack<Object> stack = new Stack<>();
+
+		stack.push(treeNode);
+
+		while (!stack.isEmpty()) {
+
+			Object current = stack.pop();
+			if (current == null)
+				continue;
+			if (current instanceof TreeNode) {
+
+				stack.push(((TreeNode) current).right);
+				stack.push(((TreeNode) current).val);
+				stack.push(((TreeNode) current).left);
+
+			} else {
+
+				int data = (Integer) current;
+				if (data >= requiredSum)
+					return 0;
+				if (seen.contains(requiredSum - data))
+					return 1;
+				seen.add(data);
+			}
+		}
+
+		return 0;
+	}

@@ -1,0 +1,36 @@
+https://app.codility.com/programmers/lessons/4-counting_elements/max_counters/
+
+	public static int[] solution(int N, int[] A) {
+
+		int maxCounterResult = Integer.MIN_VALUE;
+		int runningMax = Integer.MIN_VALUE;
+
+		int[] opArray = new int[N];
+
+		for (int i = 0; i < A.length; i++) {
+
+			int op = A[i];
+			if (op > N) {
+				//max counters
+				maxCounterResult = runningMax;
+			} else {
+				//increment op - 1
+				--op;
+				if (opArray[op] < maxCounterResult)
+					opArray[op] = maxCounterResult + 1;
+				else
+					opArray[op] += 1;
+
+				if (runningMax < opArray[op])
+					runningMax = opArray[op];
+			}
+		}
+
+		//now if any index has values less than "maxCounterResult", set it to "maxCounterResult"
+		for (int i = 0; i < opArray.length; i++) {
+			if (opArray[i] < maxCounterResult)
+				opArray[i] = maxCounterResult;
+		}
+
+		return opArray;
+	}

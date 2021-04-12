@@ -1,0 +1,23 @@
+	private static int findCandidate(int a[]) {
+
+		if (a.length <= 2)
+			return -1;
+
+		int candidate = a[0];
+		int count = 0;
+
+		for (int element : a) {
+
+			if (element == candidate)
+				count++;
+			else {
+				count--;
+				if (count == 0) {
+					candidate = element;
+					count = 1;
+				}
+			}
+		}
+
+		return candidate;
+	}

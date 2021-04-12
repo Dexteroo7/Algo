@@ -1,0 +1,57 @@
+https://practice.geeksforgeeks.org/problems/coin-change/0
+
+	private static final class Key {
+
+		final int amount, index;
+
+		private Key(int amount, int index) {
+			this.amount = amount;
+			this.index = index;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return amount == key.amount &&
+					index == key.index;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(amount, index);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int ways(int amount, int[] denoms) {
+
+		return maxSumPath(amount, denoms, 0);
+	}
+
+	private static int ways(int amount, int[] denoms, int index) {
+
+		if (amount < 0)
+			return 0;
+		if (amount == 0)
+			return 1;
+		if (index == denoms.length)
+			return 0;
+
+		Key key = new Key(amount, index);
+		Integer fromMemo = MEMO.get(key);
+		if (fromMemo != null)
+			return fromMemo;
+
+		//take or not take
+		int take = maxSumPath(amount - denoms[index], denoms, index);
+		int notTake = maxSumPath(amount, denoms, index + 1);
+
+		MEMO.put(key, take + notTake);
+		return take + notTake;
+	}

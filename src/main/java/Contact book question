@@ -1,0 +1,138 @@
+	private static final class TrieNode implements Comparable<Character> {
+
+		private final char tireChar;
+		private final List<TrieNode> children = new ArrayList<>();
+
+		private boolean isEnd = false;
+		private int childWordsCount = 0;
+
+		private TrieNode(char tireChar) {
+			this.tireChar = tireChar;
+		}
+
+		public Character getTireChar() {
+			return tireChar;
+		}
+
+		private TrieNode findInChildren(char toFind) {
+
+			int index = Collections.binarySearch(children, toFind);
+			return index >= 0 ? children.get(index) : null;
+		}
+
+		private TrieNode addCharacter(char toAdd) {
+
+			int index = Collections.binarySearch(children, toAdd);
+			if (index >= 0) {
+				return children.get(index);
+			} else {
+				TrieNode trieNode = new TrieNode(toAdd);
+				children.add((index * -1) - 1, trieNode);
+				return trieNode;
+			}
+		}
+
+		public boolean isEnd() {
+			return isEnd;
+		}
+
+		private boolean markEnd() {
+			return this.isEnd = true;
+		}
+
+		public int getChildWordsCount() {
+
+			return childWordsCount;
+		}
+
+		public int incrementChildWordsCount() {
+			return ++childWordsCount;
+		}
+
+		@Override
+		public int compareTo(Character o) {
+			return this.getTireChar().compareTo(o);
+		}
+	}
+
+	private static final class Trie {
+
+		private static Trie getInstance() {
+			return new Trie(new TrieNode((char) -1));
+		}
+
+		private final TrieNode root;
+
+		private Trie(TrieNode root) {
+			this.root = root;
+		}
+
+		private void insert(String word) {
+
+			//start crawling from root
+			TrieNode currentNode = root;
+
+			//iterate over all characters of this word
+			Iterable<Character> characters = word.chars().mapToObj(x -> (char) x)::iterator;
+			for (Character toAdd : characters) {
+				currentNode.incrementChildWordsCount();
+				currentNode = currentNode.addCharacter(toAdd);
+			}
+
+			//mark as end for last character
+			currentNode.markEnd();
+			currentNode.incrementChildWordsCount();
+		}
+
+		private int countPrefixes(String toMatch) {
+
+			TrieNode match = match(toMatch);
+			return match != null ? match.getChildWordsCount() : 0;
+		}
+
+		private TrieNode match(String toMatch) {
+
+			//start crawling from root
+			TrieNode currentNode = root;
+
+			//iterate over all characters of this word
+			Iterable<Character> characters = toMatch.chars().mapToObj(x -> (char) x)::iterator;
+
+			for (Character character : characters) {
+
+				TrieNode trieNode = currentNode.findInChildren(character);
+				//no match
+				if (trieNode == null)
+					return null;
+				currentNode = trieNode;
+			}
+
+			return currentNode;
+		}
+	}
+
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+		int ops = scanner.nextInt();
+
+		if (ops == 0)
+			return;
+
+		Trie instance = Trie.getInstance();
+
+		for (int i = 0; i < ops; i++) {
+
+			String op = scanner.next();
+			String arg = scanner.next();
+
+			if ("add".equals(op))
+				instance.insert(arg);
+			if ("find".equals(op)) {
+
+				//how many contacts start with this
+				int count = instance.countPrefixes(arg);
+				System.out.println(count);
+			}
+		}
+	}

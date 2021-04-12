@@ -1,0 +1,24 @@
+https://app.codility.com/programmers/lessons/14-binary_search_algorithm/nailing_planks/
+
+	public static int solution(int[] plankStarPositions, int[] plankEndPositions, int[] nailPositions) {
+
+		TreeSet<Integer> nailsUsed = new TreeSet<>();
+
+		int nextNailIndex = 0;
+
+		for (int index = 0; index < plankStarPositions.length; index++) {
+
+			int start = plankStarPositions[index];
+			int end = plankEndPositions[index];
+
+			while (nailsUsed.subSet(start, true, end, true).isEmpty()) {
+
+				if (nextNailIndex == nailPositions.length)
+					return -1;
+				nailsUsed.add(nailPositions[nextNailIndex]);
+				nextNailIndex++;
+			}
+		}
+
+		return nextNailIndex;
+	}

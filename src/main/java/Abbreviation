@@ -1,0 +1,56 @@
+//https://www.hackerrank.com/challenges/abbr/problem
+public class Solution {
+
+    static String abbreviation(String a, String b) {
+
+        return abbreviation(a, b, 0, 0, new String[a.length() + 1][b.length() + 1]);
+    }
+
+    static String abbreviation(String a, String b, int aStart, int bStart, String[][] memo) {
+
+        int aLength = a.length() - aStart;
+        int bLength = b.length() - bStart;
+
+        if ("YES".equals(memo[aLength][bLength]))
+            return "YES";
+        if ("NO".equals(memo[aLength][bLength]))
+            return "NO";
+
+        if (aLength == 0)
+            return memo[aLength][bLength] = (bLength == 0 ? "YES" : "NO");
+
+        char currentA = a.charAt(aStart);
+        if (Character.isLowerCase(currentA)) {
+            //drop the first index
+            String result = abbreviation(a, b, aStart + 1, bStart, memo);
+            if ("YES".equals(result))
+                return memo[aLength][bLength] = "YES";
+        }
+
+        if (bLength == 0)
+            return memo[aLength][bLength] = "NO";
+
+        //capitalize
+        if (Character.toUpperCase(currentA) == b.charAt(bStart))
+            return memo[aLength][bLength] = abbreviation(a, b, aStart + 1, bStart + 1, memo);
+        else
+            return memo[aLength][bLength] = "NO";
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(abbreviation("a", "A"));
+        System.out.println(abbreviation("aA", "AA"));
+        System.out.println(abbreviation("AbcDE", "ABDE"));
+        System.out.println(abbreviation("AbcDE", "AFDE"));
+        System.out.println(abbreviation("daBcd", "ABC"));
+
+
+        System.out.println(abbreviation("aabBB", "B"));
+        System.out.println(abbreviation("aabBB", "AB"));
+        System.out.println(abbreviation("aabBB", "BB"));
+        System.out.println(abbreviation("aabBB", "ABB"));
+        System.out.println(abbreviation("aabBB", "ABBB"));
+        System.out.println(abbreviation("aabBB", "AABBB"));
+    }
+}

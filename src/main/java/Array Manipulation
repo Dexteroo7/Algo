@@ -1,0 +1,35 @@
+//https://www.hackerrank.com/challenges/crush/problem
+
+	public static void main(String[] args) {
+
+		Scanner in = new Scanner(System.in);
+		int n = in.nextInt();
+		int m = in.nextInt();
+
+		long[] arr = new long[n];
+
+		for (int a0 = 0; a0 < m; a0++) {
+
+			int rangeStart = in.nextInt() - 1;
+			int rangeEnd = in.nextInt() - 1;
+			int value = in.nextInt();
+
+			//mark the index at rangeStart to be "value" more
+			arr[rangeStart] = arr[rangeStart] + value;
+
+			//mark the index at rangeEnd + 1 to be "value" less
+			if (rangeEnd < n - 1)
+				arr[rangeEnd + 1] = arr[rangeEnd + 1] - value;
+		}
+
+		long max = Long.MIN_VALUE;
+		long current = 0;
+		for (long i : arr) {
+			current = current + i;
+			if (current > max)
+				max = current;
+		}
+
+		System.out.println(max);
+		in.close();
+	}

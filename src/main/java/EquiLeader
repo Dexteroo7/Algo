@@ -1,0 +1,54 @@
+https://app.codility.com/programmers/lessons/8-leader/equi_leader/
+
+	public static int solution(int[] values) {
+
+		if (values.length < 2)
+			return 0;
+
+		int stackTop = values[0];
+		int count = 0;
+
+		for (int index = 0; index < values.length; index++) {
+
+			int currentValue = values[index];
+			if (count == 0) {
+				stackTop = currentValue;
+				count++;
+			} else if (stackTop == currentValue)
+				count++;
+			else
+				count--;
+		}
+
+		count = 0;
+		int leader = stackTop;
+		for (int index = 0; index < values.length; index++)
+			if (values[index] == stackTop)
+				count++;
+
+		//equi leader is only possible is leader is there
+		if (count <= values.length / 2) {
+			return 0;
+		}
+
+		//now start from 0
+		int equiLeaderCount = 0;
+		int leftCount = 0;
+		int rightCount = count;
+		for (int index = 0; index < values.length; index++) {
+
+			int currentValue = values[index];
+			int leftSize = index + 1;
+			int rightSize = values.length - leftSize;
+
+			if (currentValue == leader) {
+				leftCount++;
+				rightCount--;
+			}
+
+			if (leftCount > leftSize / 2 && rightCount > rightSize / 2)
+				equiLeaderCount++;
+		}
+
+		return equiLeaderCount;
+	}

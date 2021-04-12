@@ -1,0 +1,28 @@
+https://practice.geeksforgeeks.org/problems/anagram/0
+
+	private static boolean isAnagram(String a, String b) {
+
+		Map<Character, Integer> characterCountMap = new HashMap<>(256);
+		for (int index = 0; index < a.length(); index++) {
+			characterCountMap.compute(a.charAt(index), (na, count) -> count == null ? 1 : count + 1);
+		}
+
+		for (int index = 0; index < b.length(); index++) {
+			characterCountMap.compute(b.charAt(index), (na, count) -> count == null ? -1 : count - 1);
+		}
+
+		characterCountMap.entrySet().removeIf(entry -> entry.getValue() == 0);
+		return characterCountMap.isEmpty();
+	}
+
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+
+		int testCases = scanner.nextInt();
+
+		for (int i = 0; i < testCases; i++) {
+
+			System.out.println(isAnagram(scanner.next(), scanner.next()) ? "YES" : "NO");
+		}
+	}

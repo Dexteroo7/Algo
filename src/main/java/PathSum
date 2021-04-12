@@ -1,0 +1,28 @@
+https://www.interviewbit.com/problems/path-sum/
+
+	public static int hasPathSum(TreeNode treeNode, int requiredSum) {
+
+		//null or no children
+		if (treeNode == null || (treeNode.left == null && treeNode.right == null))
+			return 0;
+
+		return hasPathSumChild(treeNode, requiredSum);
+	}
+
+	public static int hasPathSumChild(TreeNode treeNode, int requiredSum) {
+
+		if (treeNode == null)
+			return 0;
+
+		//reached leaf
+		if (treeNode.left == null && treeNode.right == null)
+			return requiredSum == treeNode.val ? 1 : 0;
+
+		int fromLeft = hasPathSumChild(treeNode.left, requiredSum - treeNode.val);
+		if (fromLeft == 1)
+			return 1;
+		int fromRight = hasPathSumChild(treeNode.right, requiredSum - treeNode.val);
+		if (fromRight == 1)
+			return 1;
+		return 0;
+	}

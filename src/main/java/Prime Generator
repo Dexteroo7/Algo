@@ -1,0 +1,81 @@
+http://www.spoj.com/problems/PRIME1/
+
+	private static final List<Integer> PRIMES = new ArrayList<>(3403);
+
+	static {
+
+		int limit = (int) Math.sqrt(1000000000) + 1;
+
+		BitSet sieve = new BitSet(limit);
+		sieve.set(0);
+		sieve.set(1);
+
+		//fill up the seize
+		int currentPrime = 2;
+		while (currentPrime < 31623) {
+
+			//mark all multiples of currentPrime
+			for (int i = currentPrime, multiple = currentPrime * i;
+				 multiple <= limit;
+				 i++, multiple = currentPrime * i) {
+				sieve.set(multiple);
+			}
+
+			//move to next unmarked value
+			do {
+				currentPrime++;
+			} while (sieve.get(currentPrime));
+		}
+
+		for (int i = 0; i <= limit; i++) {
+			if (!sieve.get(i))
+				PRIMES.add(i);
+		}
+	}
+
+	private static List<Integer> getPrimes(int lowerBound, int upperBound) {
+
+		int limit = upperBound - lowerBound + 1;
+		List<Integer> primesToReturn = new ArrayList<>((int) Math.sqrt(limit) + 1);
+		BitSet segment = new BitSet(limit);
+
+		for (int currentPrime : PRIMES) {
+			//mark all multiples of currentPrime
+			for (int i = Integer.max((lowerBound + 1) / currentPrime, currentPrime), multiple = currentPrime * i;
+				 multiple <= upperBound & currentPrime <= upperBound;
+				 i++, multiple = currentPrime * i) {
+				if (multiple >= lowerBound)
+					//map the multiple to segment
+					segment.set(multiple - lowerBound);
+			}
+		}
+
+		for (int i = 0; i < limit; i++) {
+
+			if (!segment.get(i)) {
+				int prime = i + lowerBound;
+				if (prime > 1)
+					primesToReturn.add(i + lowerBound);
+			}
+		}
+
+		return primesToReturn;
+	}
+
+	public static void main(String[] args) {
+
+		//		System.out.println(PRIMES);
+
+		Scanner scanner = new Scanner(System.in);
+
+		int testCases = scanner.nextInt();
+
+		for (int i = 0; i < testCases; i++) {
+
+			int lowerBound = scanner.nextInt();
+			int upperBoundBound = scanner.nextInt();
+			List<Integer> primes = getPrimes(lowerBound, upperBoundBound);
+			primes.forEach(System.out::println);
+			System.out.println("");
+		}
+	}

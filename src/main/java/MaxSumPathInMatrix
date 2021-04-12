@@ -1,0 +1,63 @@
+https://practice.geeksforgeeks.org/problems/path-in-matrix/0
+
+private static final class Key {
+
+		final int i, j;
+
+		private Key(int i, int j) {
+			this.i = i;
+			this.j = j;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return i == key.i &&
+					j == key.j;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(i, j);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int maxSumPath(int[][] matrix) {
+
+		int max = 0;
+		for (int i = 0; i < matrix[0].length; i++) {
+			int sum = maxSumPath(matrix, 0, i);
+			MEMO.clear();
+			if (sum > max)
+				max = sum;
+		}
+		return max;
+	}
+
+	private static int maxSumPath(int[][] matrix, int i, int j) {
+
+		if (i == matrix.length || i < 0)
+			return 0;
+		if (j == matrix[i].length || j < 0)
+			return 0;
+
+		Key key = new Key(i, j);
+		if (MEMO.containsKey(key))
+			return MEMO.get(key);
+
+		int current = matrix[i][j];
+		int moveA = current + maxSumPath(matrix, i + 1, j);
+		int moveB = current + maxSumPath(matrix, i + 1, j - 1);
+		int moveC = current + maxSumPath(matrix, i + 1, j + 1);
+
+		int toReturn = Integer.max(moveA, Integer.max(moveB, moveC));
+		MEMO.put(key, toReturn);
+		return toReturn;
+	}

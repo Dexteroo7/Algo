@@ -1,0 +1,43 @@
+	public static int books(int[] pages, int students) {
+
+		if (students > pages.length)
+			return -1;
+
+		int high = IntStream.of(pages).sum();
+		int low = IntStream.of(pages).min().getAsInt();
+
+		int res = high;
+
+		while (low <= high) {
+
+			int maxPagesPerStudent = (low + high) / 2;
+			if (isValidAssignment(pages, students, maxPagesPerStudent)) {
+
+				high = maxPagesPerStudent - 1;
+				res = maxPagesPerStudent;
+			} else
+				low = maxPagesPerStudent + 1;
+		}
+
+		return res;
+	}
+
+	private static boolean isValidAssignment(int[] pages, int students, int maxPagesPerStudent) {
+
+		int totalBooks = pages.length;
+		int index = 0;
+
+		for (int i = 0; i < students & index < totalBooks; i++) {
+
+			int totalPages = 0;
+			while (index < totalBooks) {
+
+				totalPages += pages[index];
+				if (totalPages > maxPagesPerStudent)
+					break;
+				index++;
+			}
+		}
+
+		return index == totalBooks;
+	}

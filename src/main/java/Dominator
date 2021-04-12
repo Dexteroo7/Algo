@@ -1,0 +1,35 @@
+https://app.codility.com/programmers/lessons/8-leader/dominator/
+
+	public static int solution(int[] values) {
+
+		if (values.length == 0)
+			return -1;
+		if (values.length == 1)
+			return 0;
+
+		int stackTop = values[0];
+		int count = 0;
+
+		for (int index = 0; index < values.length; index++) {
+
+			int currentValue = values[index];
+			if (count == 0) {
+				stackTop = currentValue;
+				count++;
+			} else if (stackTop == currentValue)
+				count++;
+			else
+				count--;
+		}
+
+		count = 0;
+		int savedIndex = -1;
+		for (int index = 0; index < values.length; index++) {
+			if (values[index] == stackTop) {
+				savedIndex = index;
+				count++;
+			}
+		}
+
+		return count > values.length / 2 ? savedIndex : -1;
+	}

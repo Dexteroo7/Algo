@@ -1,0 +1,17 @@
+https://practice.geeksforgeeks.org/problems/level-order-traversal/1
+
+	void levelOrder(Node current) {
+
+		LinkedList<Node> bfsHelper = new LinkedList<>();
+		bfsHelper.add(current);
+
+		while (!bfsHelper.isEmpty()) {
+
+			Node toPrint = bfsHelper.poll();
+			System.out.print(toPrint.data + " ");
+			if (toPrint.left != null)
+				bfsHelper.add(toPrint.left);
+			if (toPrint.right != null)
+				bfsHelper.add(toPrint.right);
+		}
+	}

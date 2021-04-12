@@ -1,0 +1,26 @@
+https://practice.geeksforgeeks.org/problems/stickler-theif/0
+
+static int maxNonContiguous(int[] arr) {
+
+		if (arr.length == 1)
+			return arr[0];
+		if (arr.length == 2)
+			return Integer.max(arr[0], arr[1]);
+
+		int maxP = arr[1];
+		int maxPP = arr[0];
+		int currentMax, max;
+		currentMax = max = Integer.max(maxPP, maxP);
+
+		for (int i = 2; i < arr.length; i++) {
+
+			//this plus max till 1 house before
+			currentMax = arr[i] + maxPP;
+			if (currentMax > max)
+				max = currentMax;
+			maxPP = Integer.max(maxPP, maxP);
+			maxP = currentMax;
+		}
+
+		return max;
+	}

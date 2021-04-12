@@ -1,0 +1,70 @@
+	private static final class Key {
+		
+		final String a, b;
+		final int indexA, indexB;
+
+		private Key(String a, String b, int indexA, int indexB) {
+			this.a = a;
+			this.b = b;
+			this.indexA = indexA;
+			this.indexB = indexB;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return indexA == key.indexA &&
+					indexB == key.indexB &&
+					Objects.equals(a, key.a) &&
+					Objects.equals(b, key.b);
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(a, b, indexA, indexB);
+		}
+	}
+	
+	private static final Map<Key, Integer> memo = new HashMap<>();
+	
+	private static int minSwaps(String smaller, String larger, int indexA, int indexB) {
+
+		//pick the smaller by effective length
+		if (smaller.length() - indexA > larger.length() - indexB)
+			return minSwaps(larger, smaller, indexB, indexA);
+
+		//need to remove the remaining values
+		if (indexA == smaller.length())
+			return (larger.length() - indexB) - (smaller.length() - indexA);
+		
+		Key key = new Key(smaller, larger, indexA, indexB);
+		if (memo.containsKey(key))
+			return memo.get(key);
+		
+		char fromA = smaller.charAt(indexA);
+		char fromB = larger.charAt(indexB);
+
+		//no op
+		if (fromA == fromB)
+			return minSwaps(smaller, larger, indexA + 1, indexB + 1);
+
+		//remove from a
+		int optionA = 1 + minSwaps(smaller, larger, indexA + 1, indexB);
+		//remove from b
+		int optionB = 1 + minSwaps(smaller, larger, indexA, indexB + 1);
+		//replace
+		int optionC = 1 + minSwaps(smaller, larger, indexA + 1, indexB + 1);
+
+		//return the cheapest option
+		int min = Integer.min(optionA, optionB);
+		min = Integer.min(min, optionC);
+
+		memo.put(key, min);
+		
+		return min;
+	}

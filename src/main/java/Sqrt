@@ -1,0 +1,30 @@
+https://www.interviewbit.com/problems/square-root-of-integer/
+
+public static int sqrt(int number) {
+
+		if (number == 0)
+			return 0;
+		if (number == 1)
+			return 1;
+
+		int high = number / 2;
+		int low = 1;
+		int res = high;
+
+		while (low <= high) {
+
+			int mid = (high + low) / 2;
+			long check = (long) mid * (long) mid;
+			if (check == number)
+				return mid;
+
+			if (check < number) {
+
+				res = mid;
+				low = mid + 1;
+			} else
+				high = mid - 1;
+		}
+
+		return res;
+ }

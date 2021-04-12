@@ -1,0 +1,21 @@
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+		int testCases = scanner.nextInt();
+
+		for (int i = 0; i < testCases; i++) {
+
+			int N = scanner.nextInt();
+			int runningXOR = 0;
+			for (int i1 = 0; i1 < N - 1; i1++) {
+				runningXOR = runningXOR ^ scanner.nextInt();
+			}
+
+			int expectedXOR = 0;
+			for (int i1 = 1; i1 <= N; i1++) {
+				expectedXOR = expectedXOR ^ i1;
+			}
+
+			System.out.println(runningXOR ^ expectedXOR);
+		}
+	}

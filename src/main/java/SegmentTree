@@ -1,0 +1,151 @@
+	private static abstract class AbstractSegmentTree<Data, Segment> {
+
+		final Segment[] segments;
+		final int size;
+
+		public AbstractSegmentTree(Data[] data, Class<Segment> segmentClass) {
+
+			this(data.length, segmentClass);
+			construct(0, data.length - 1, 0, data);
+		}
+
+		public AbstractSegmentTree(Data initialValue, int size, Class<Segment> segmentClass) {
+
+			this(size, segmentClass);
+			Arrays.fill(segments, initialValue);
+		}
+
+		private AbstractSegmentTree(int size, Class<Segment> segmentClass) {
+
+			// Allocate memory for segment tree
+			//Height of segment tree
+			int height = (int) (Math.ceil(Math.log(size) / Math.log(2)));
+			//Maximum size of segment tree
+			int max_size = 2 * (int) Math.pow(2, height) - 1;
+
+			//noinspection unchecked
+			this.segments = (Segment[]) Array.newInstance(segmentClass, max_size);
+			this.size = size;
+		}
+
+		/**
+		 * utility to construct the segment tree
+		 *
+		 * @param segmentStart        the starting index of data[] represented by this segment (inclusive)
+		 * @param segmentEnd          the ending index of data[] represented by this segment (inclusive)
+		 * @param currentSegmentIndex current segment index
+		 * @param data
+		 * @return the constructed segment at this step
+		 */
+		private Segment construct(int segmentStart, int segmentEnd, int currentSegmentIndex, Data[] data) {
+
+			if (segmentStart == segmentEnd)
+				return segments[currentSegmentIndex] = initializer(data[segmentStart]);
+
+			int mid = (segmentStart + segmentEnd) / 2;
+			int leftSegmentIndex = 2 * currentSegmentIndex + 1;
+			int rightSegmentIndex = 2 * currentSegmentIndex + 2;
+
+			Segment leftSegment = construct(segmentStart, mid, leftSegmentIndex, data);
+			Segment rightSegment = construct(mid + 1, segmentEnd, rightSegmentIndex, data);
+			return segments[currentSegmentIndex] = combiner(leftSegment, rightSegment);
+		}
+
+		/**
+		 * perform a range query on this segment tree. return type of this range query will be same as segment,
+		 * by virtue of segment tree property
+		 *
+		 * @param start starting index of range query (inclusive)
+		 * @param end   end index on range query (inclusive)
+		 * @return result of this range query
+		 */
+		public Segment rangeQuery(int start, int end) {
+
+			if (start < 0 || end >= size || start > end)
+				throw new IllegalArgumentException("Out of range query");
+
+			//noinspection ConstantConditions
+			return rangeQuery(0, size - 1, 0, start, end).get();
+		}
+
+		private Optional<Segment> rangeQuery(int segmentStart, int segmentEnd, int currentSegmentIndex, int queryStart, int queryEnd) {
+
+			//base case
+			if (queryStart <= segmentStart && queryEnd >= segmentEnd)
+				return Optional.of(segments[currentSegmentIndex]);
+
+			//base case
+			if (queryStart > segmentEnd || queryEnd < segmentStart)
+				return Optional.empty();
+
+			int mid = (segmentStart + segmentEnd) / 2;
+			int leftSegmentIndex = 2 * currentSegmentIndex + 1;
+			int rightSegmentIndex = 2 * currentSegmentIndex + 2;
+
+			Optional<Segment> leftSegment = rangeQuery(segmentStart, mid, leftSegmentIndex, queryStart, queryEnd);
+			Optional<Segment> rightSegment = rangeQuery(mid + 1, segmentEnd, rightSegmentIndex, queryStart, queryEnd);
+
+			//combine results coming from base cases
+			if (leftSegment.isPresent() && rightSegment.isPresent())
+				return Optional.of(combiner(leftSegment.get(), rightSegment.get()));
+			return leftSegment.isPresent() ? leftSegment : rightSegment;
+		}
+
+		abstract Segment initializer(Data data);
+
+		abstract Segment combiner(Segment a, Segment b);
+	}
+
+	private static final class SumSegmentTree extends AbstractSegmentTree<Integer, Integer> {
+
+		public SumSegmentTree(int initialValue, int size) {
+			super(initialValue, size, Integer.class);
+		}
+
+		public SumSegmentTree(Integer[] initialData) {
+			super(initialData, Integer.class);
+		}
+
+		@Override
+		Integer initializer(Integer value) {
+			return value;
+		}
+
+		@Override
+		Integer combiner(Integer a, Integer b) {
+			return a + b;
+		}
+
+		void updateQuery(int index, int newValue) {
+
+			if (index < 0 || index >= size)
+				throw new IllegalArgumentException("Out of range query");
+
+			updateQuery(0, size - 1, 0, index, newValue);
+		}
+
+		int updateQuery(int segmentStart, int segmentEnd, int currentSegmentIndex, int index, int newValue) {
+
+			//check for overlap
+			if (index >= segmentStart && index <= segmentEnd) {
+
+				//process the leaf
+				if (segmentStart == segmentEnd) {
+					return segments[currentSegmentIndex] = newValue;
+				}
+
+				//combine results coming from base cases
+				int mid = (segmentStart + segmentEnd) / 2;
+				int leftSegmentIndex = 2 * currentSegmentIndex + 1;
+				int rightSegmentIndex = 2 * currentSegmentIndex + 2;
+
+				int fromLeft = updateQuery(segmentStart, mid, leftSegmentIndex, index, newValue);
+				int fromRight = updateQuery(mid + 1, segmentEnd, rightSegmentIndex, index, newValue);
+
+				return segments[currentSegmentIndex] = combiner(fromLeft, fromRight);
+			}
+
+			//no overlap, return as is
+			return segments[currentSegmentIndex];
+		}
+	}

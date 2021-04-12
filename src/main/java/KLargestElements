@@ -1,0 +1,35 @@
+https://practice.geeksforgeeks.org/problems/k-largest-elements/0
+
+	public static void main(String[] args) throws IOException {
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+
+		int testCases = Integer.parseInt(input.readLine());
+
+		for (int i = 0; i < testCases; i++) {
+
+			StringTokenizer tokenizer = new StringTokenizer(input.readLine(), " ");
+			int n = Integer.parseInt(tokenizer.nextToken());
+			int k = Integer.parseInt(tokenizer.nextToken());
+			PriorityQueue<Integer> heap = new PriorityQueue<>(k);
+
+			tokenizer = new StringTokenizer(input.readLine(), " ");
+			for (int j = 0; j < n; j++) {
+
+				int newElement = Integer.parseInt(tokenizer.nextToken());
+
+				//remove the smallest if it is smaller than this
+				if (heap.size() >= k) {
+					if (newElement > heap.peek()) {
+						heap.poll();
+						heap.add(newElement);
+					}
+				} else
+					heap.add(newElement);
+			}
+
+			heap.stream().sorted(Comparator.<Integer>comparingInt(x -> x).reversed())
+				.forEach(element -> System.out.print(element + " "));
+			System.out.println();
+		}
+	}

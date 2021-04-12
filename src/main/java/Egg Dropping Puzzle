@@ -1,0 +1,55 @@
+	private static final class Key {
+
+		final int eggs, floors;
+
+		private Key(int eggs, int floors) {
+			this.eggs = eggs;
+			this.floors = floors;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return eggs == key.eggs &&
+					floors == key.floors;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(eggs, floors);
+		}
+	}
+
+	private static final Map<Key, Integer> MEMO = new HashMap<>();
+
+	private static int minEggDrops(int eggs, int floors) {
+
+		//base cases
+		if (eggs == 1)
+			return floors;
+		if (floors == 0)
+			return 0;
+
+		Key key = new Key(eggs, floors);
+		Integer min = MEMO.get(key);
+		if (min != null)
+			return min;
+
+		min = Integer.MAX_VALUE;
+		for (int i = 1; i <= floors; i++) {
+
+			//drop from i'th and breaks
+			int a = 1 + minEggDrops(eggs - 1, i - 1);
+			//drop from i'th and does not break
+			int b = 1 + minEggDrops(eggs, floors - i);
+			min = Integer.min(min, Integer.max(a, b));
+		}
+
+		MEMO.put(key, min);
+		return min;
+	}

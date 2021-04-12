@@ -1,0 +1,66 @@
+
+	private static final class Key {
+
+		//our sentinel and the pos where we are currently at
+
+		final int element;
+		final int pos;
+
+		private Key(int element, int pos) {
+			this.element = element;
+			this.pos = pos;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (!(o instanceof Key))
+				return false;
+			Key key = (Key) o;
+			return element == key.element &&
+					pos == key.pos;
+		}
+
+		@Override
+		public int hashCode() {
+
+			return Objects.hash(element, pos);
+		}
+	}
+
+	private static final Map<Key, Integer> memo = new HashMap<>();
+
+	private static int lis(int[] arr) {
+
+		int max = 0;
+		for (int i = 0; i < arr.length; i++) {
+
+			int lis = lis(arr[i], arr, i + 1);
+			if (lis > max)
+				max = lis;
+		}
+
+		return max;
+	}
+
+	private static int lis(int ele, int[] arr, int limit) {
+
+		if (limit == arr.length)
+			return 1;
+
+		Key key = new Key(ele, limit);
+		if (memo.containsKey(key))
+			return memo.get(key);
+
+		int newValue = arr[limit];
+		int toReturn;
+
+		if (newValue > ele) {
+			toReturn = Integer.max(1 + lis(newValue, arr, limit + 1), lis(ele, arr, limit + 1));
+		} else
+			toReturn = lis(ele, arr, limit + 1);
+
+		memo.put(new Key(ele, limit), toReturn);
+		return toReturn;
+	}

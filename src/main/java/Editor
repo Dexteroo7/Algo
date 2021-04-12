@@ -1,0 +1,101 @@
+	//https://www.hackerrank.com/challenges/simple-text-editor/problem
+  
+  private enum OP_TYPE {
+		APPEND,
+		DELETE
+	}
+
+	private static final class Operation {
+		private final OP_TYPE op_type;
+		private final String opDetails;
+
+		private Operation(OP_TYPE op_type, String opDetails) {
+			this.op_type = op_type;
+			this.opDetails = opDetails;
+		}
+	}
+
+	private static final class Editor {
+
+		private final Stack<Operation> operationStack = new Stack<>();
+		private char[] characters = new char[0];
+
+		private void printKth(int k) {
+			System.out.println(characters[k - 1]);
+		}
+
+		//append to editor
+		private void append(String toAppend, boolean saveState) {
+
+			this.characters = concatenate(characters, toAppend);
+			if (saveState)
+				this.operationStack.push(new Operation(OP_TYPE.APPEND, toAppend));
+		}
+
+		//delete last k characters
+		private void delete(int lastK, boolean saveState) {
+
+			if (saveState) {
+				char[] willBeRemoved = Arrays.copyOfRange(characters, characters.length - lastK, characters.length);
+				this.operationStack.push(new Operation(OP_TYPE.DELETE, new String(willBeRemoved)));
+			}
+
+			this.characters = Arrays.copyOf(characters, characters.length - lastK);
+		}
+
+		//undo last operations
+		private void undo() {
+
+			Operation toReverse = operationStack.pop();
+			if (toReverse.op_type == OP_TYPE.APPEND) {
+				//simply delete lastK
+				delete(toReverse.opDetails.length(), false);
+			} else {
+				//simply add
+				append(toReverse.opDetails, false);
+			}
+		}
+
+		private char[] concatenate(char[] source, String toAppend) {
+
+			int aLen = source.length;
+			int bLen = toAppend.length();
+
+			char[] toReturn = new char[aLen + bLen];
+			System.arraycopy(source, 0, toReturn, 0, aLen);
+
+			final int[] startFrom = { aLen };
+			toAppend.chars().forEach(value -> {
+				toReturn[startFrom[0]] = (char) value;
+				startFrom[0]++;
+			});
+
+			return toReturn;
+		}
+	}
+
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+		Editor editor = new Editor();
+
+		int totalOps = Integer.parseInt(scanner.nextLine());
+		for (int i = 0; i < totalOps; i++) {
+
+			String[] op = scanner.nextLine().split(" ");
+			switch (op[0]) {
+				case "1":
+					editor.append(op[1], true);
+					break;
+				case "2":
+					editor.delete(Integer.parseInt(op[1]), true);
+					break;
+				case "3":
+					editor.printKth(Integer.parseInt(op[1]));
+					break;
+				case "4":
+					editor.undo();
+					break;
+			}
+		}
+	}

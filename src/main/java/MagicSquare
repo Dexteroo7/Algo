@@ -1,0 +1,129 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
+//https://www.hackerrank.com/challenges/magic-square-forming/problem?h_r=profile
+public class MagicSquare {
+
+    public static void main(String[] args) throws IOException {
+        System.out.println(formingMagicSquare(new int[][]{{2, 9, 8}, {4, 2, 7}, {5, 6, 7}}));
+//        System.out.println(allMagicSquares());
+    }
+
+    static List<Integer> MAGIC_SQUARES = Arrays.asList(276951438, 294753618, 438951276, 492357816, 618753294, 672159834, 816357492, 834159672);
+
+    static int formingMagicSquare(int[][] s) {
+
+        int min = Integer.MAX_VALUE;
+        for (Integer square : MAGIC_SQUARES) {
+            int difference = difference(s, square);
+            if (difference < min) {
+                min = difference;
+//                System.out.println(square);
+//                System.out.println(difference);
+            }
+        }
+        return min;
+    }
+
+    private int solution(String inputPath) throws IOException {
+
+        String pixels = Files.lines(Path.of(inputPath))
+                .collect(toList()).get(0);
+
+        return -1;
+    }
+
+    static List<Integer> allMagicSquares() {
+
+        List<Integer> magicSquares = new ArrayList<>();
+
+        for (int i = 111111111; i < 999999999; i++) {
+            //row1
+            int a = mapToArrayPos(0, 0, i);
+            int b = mapToArrayPos(0, 1, i);
+            int c = mapToArrayPos(0, 2, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //row2
+            a = mapToArrayPos(1, 0, i);
+            b = mapToArrayPos(1, 1, i);
+            c = mapToArrayPos(1, 2, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //row3
+            a = mapToArrayPos(2, 0, i);
+            b = mapToArrayPos(2, 1, i);
+            c = mapToArrayPos(2, 2, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //col1
+            a = mapToArrayPos(0, 0, i);
+            b = mapToArrayPos(1, 0, i);
+            c = mapToArrayPos(2, 0, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //col2
+            a = mapToArrayPos(0, 1, i);
+            b = mapToArrayPos(1, 1, i);
+            c = mapToArrayPos(2, 1, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //col3
+            a = mapToArrayPos(0, 2, i);
+            b = mapToArrayPos(1, 2, i);
+            c = mapToArrayPos(2, 2, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //diag1
+            a = mapToArrayPos(0, 0, i);
+            b = mapToArrayPos(1, 1, i);
+            c = mapToArrayPos(2, 2, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            //diag2
+            a = mapToArrayPos(0, 2, i);
+            b = mapToArrayPos(1, 1, i);
+            c = mapToArrayPos(2, 0, i);
+            if (shouldSkip(a, b, c))
+                continue;
+            magicSquares.add(i);
+        }
+        return magicSquares;
+    }
+
+    static boolean shouldSkip(int a, int b, int c) {
+        return a == b || a == c || b == c || a == 0 || b == 0 || c == 0 || (a + b + c) != 15;
+    }
+
+    static int difference(int[][] square, int magicSquare) {
+
+        int sum = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+
+                sum += mod(square[i][j] - mapToArrayPos(i, j, magicSquare));
+            }
+        }
+        return sum;
+    }
+
+    static int mapToArrayPos(int row, int column, int number) {
+
+        int digit = (column + 3 * row);
+        while (digit < 8) {
+            number = number / 10;
+            digit++;
+        }
+        return number % 10;
+    }
+
+    static int mod(int g) {
+        return g < 0 ? g * -1 : g;
+    }
+

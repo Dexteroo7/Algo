@@ -1,0 +1,57 @@
+https://www.geeksforgeeks.org/count-palindrome-sub-strings-string/
+
+	//return starting and ending indexes of all palindromes
+	private static Collection<int[]> allPalindromes(String toCheck) {
+
+		int stringLength = toCheck.length();
+
+		//corner cases
+		if (stringLength < 2)
+			return Collections.emptyList();
+		if (stringLength == 2 && toCheck.charAt(0) == toCheck.charAt(1))
+			return Collections.singletonList(new int[] { 0, 1 });
+
+		Set<int[]> toReturn = new HashSet<>();
+		boolean[][] palindromeLookup = new boolean[stringLength][stringLength];
+
+		//mark single and double length palindromes
+		for (int i = 0; i < stringLength - 1; i++) {
+			palindromeLookup[i][i] = true;
+			if (toCheck.charAt(i) == toCheck.charAt(i + 1)) {
+				palindromeLookup[i][i + 1] = true;
+				toReturn.add(new int[] { i, i + 1 });
+			}
+		}
+		palindromeLookup[stringLength - 1][stringLength - 1] = true;
+
+		//now start with strings of size 3, and go upto complete length
+		for (int size = 3; size <= stringLength; size++) {
+
+			for (int startIndex = 0, endIndex = startIndex + size - 1;
+				 startIndex < endIndex & endIndex < stringLength;
+				 startIndex++, endIndex++) {
+
+				if (toCheck.charAt(startIndex) == toCheck.charAt(endIndex) &&
+						palindromeLookup[startIndex + 1][endIndex - 1]) {
+
+					palindromeLookup[startIndex][endIndex] = true;
+					toReturn.add(new int[] { startIndex, endIndex });
+				}
+			}
+		}
+
+		return toReturn;
+	}
+
+	public static void main(String[] args) {
+
+		Scanner scanner = new Scanner(System.in);
+		int testCases = scanner.nextInt();
+
+		for (int i = 0; i < testCases; i++) {
+
+			scanner.nextInt();
+			String text = scanner.next();
+			System.out.println(allPalindromes(text).size());
+		}
+	}

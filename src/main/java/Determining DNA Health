@@ -1,0 +1,151 @@
+https://www.hackerrank.com/challenges/determining-dna-health/problem
+
+	private static final class Trie {
+
+		private final List<Integer> indexesOfCompletedWords = new ArrayList<>(128);
+		private final Trie[] nextStates = new Trie[26];
+		private Trie failure;
+	}
+
+	private static final class Aho {
+
+		private final Trie root = new Trie();
+		private final String[] genes;
+
+		private Aho(String[] genes) {
+			this.genes = genes;
+			initialize();
+		}
+
+		private void initialize() {
+			for (int index = 0; index < this.genes.length; index++) {
+				insert(genes[index], index);
+			}
+			buildFailure();
+		}
+
+		private void insert(String word, int index) {
+
+			Trie current = root;
+
+			for (int i = 0; i < word.length(); i++) {
+
+				int character = word.charAt(i) - 'a';
+				if (current.nextStates[character] == null)
+					current.nextStates[character] = new Trie();
+				current = current.nextStates[character];
+			}
+			current.indexesOfCompletedWords.add(index);
+		}
+
+		private void buildFailure() {
+
+			Queue<Trie> breadthFirstQueue = new ArrayDeque<>();
+			breadthFirstQueue.offer(root);
+
+			while (!breadthFirstQueue.isEmpty()) {
+
+				Trie current = breadthFirstQueue.poll();
+
+				for (int index = 0; index < 26; index++) {
+
+					Trie next = current.nextStates[index];
+					if (next != null) {
+
+						//failure of root is root
+						Trie failure;
+						if (current == root)
+							failure = root;
+						else {
+							failure = current.failure;
+							//loop back till character matches
+							while (failure != null && failure.nextStates[index] == null)
+								failure = failure.failure;
+							//worst case failure is root
+							if (failure == null)
+								failure = root;
+							else
+								failure = failure.nextStates[index];
+						}
+
+						//set the failure
+						next.failure = failure;
+						//add to breadthFirstQueue
+						breadthFirstQueue.offer(next);
+					}
+
+				}
+			}
+		}
+
+		private long computeDnaHealth(Object[] dna, int first, int last, int[] geneHealth) {
+
+			long health = 0;
+
+			Trie current = root;
+
+			char[] actualChars = (char[]) dna[0];
+			int limit = (int) dna[1];
+
+			for (int index = 0; index < limit; index++) {
+
+				int characterToLookFor = actualChars[index] - 'a';
+
+				while (current.nextStates[characterToLookFor] == null && current != root)
+					current = current.failure;
+
+				if (current.nextStates[characterToLookFor] == null)
+					continue;
+
+				current = current.nextStates[characterToLookFor];
+
+				Trie healthComputer = current;
+				while (healthComputer != root) {
+
+					List<Integer> completedWords = healthComputer.indexesOfCompletedWords;
+					for (int i = 0; i < completedWords.size(); i++) {
+
+						int foundGeneIndex = completedWords.get(i);
+						if (foundGeneIndex >= first && foundGeneIndex <= last)
+							health += geneHealth[foundGeneIndex];
+					}
+					healthComputer = healthComputer.failure;
+				}
+			}
+
+			return health;
+		}
+	}
+
+	private static void main(String[] args) throws IOException {
+
+		InputReader inputReader = new InputReader(new FileInputStream("input.txt"));
+
+		int n = inputReader.nextInt();
+
+		String[] geneValues = inputReader.nextStringArray(n);
+		int[] geneHealth = inputReader.nextIntArray(n);
+
+		////////////////////////////////////////
+		////////////////////////////////////////
+
+		Aho ahoAutomaton = new Aho(geneValues);
+		long maxHealth = Long.MIN_VALUE, minHealth = Long.MAX_VALUE;
+
+		int testCases = inputReader.nextInt();
+		for (int na = 0; na < testCases; na++) {
+
+			int first = inputReader.nextInt();
+			int last = inputReader.nextInt();
+			Object[] dna = inputReader.nextStringSpecial();
+
+			long totalHealth = ahoAutomaton.computeDnaHealth(dna, first, last, geneHealth);
+
+			if (totalHealth > maxHealth)
+				maxHealth = totalHealth;
+			if (totalHealth < minHealth)
+				minHealth = totalHealth;
+		}
+
+		System.out.println(minHealth + " " + maxHealth);
+	}

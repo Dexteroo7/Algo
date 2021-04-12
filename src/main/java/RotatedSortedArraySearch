@@ -1,0 +1,38 @@
+https://www.interviewbit.com/problems/rotated-sorted-array-search/
+
+	public static int search(List<Integer> list, int toSearch) {
+
+		if (list.size() == 1)
+			return list.get(0) == toSearch ? 0 : -1;
+
+		int pivotIndex = findPivotIndex(list);
+
+		List<Integer> left = list.subList(0, pivotIndex);
+		List<Integer> right = list.subList(pivotIndex, list.size());
+
+		int fromLeft = Collections.binarySearch(left, toSearch);
+		int fromRight = Collections.binarySearch(right, toSearch);
+
+		if (fromLeft >= 0)
+			return fromLeft;
+		if (fromRight >= 0)
+			return pivotIndex + fromRight;
+		return -1;
+	}
+
+	private static int findPivotIndex(List<Integer> list) {
+
+		if (list.size() == 1)
+			return 0;
+		if (list.size() == 2 && list.get(0) > list.get(1))
+			return 1;
+
+		int mid = list.size() / 2;
+		if (list.get(0) > list.get(mid))
+			return findPivotIndex(list.subList(0, mid + 1));
+		if (list.get(mid) > list.get(list.size() - 1))
+			return mid + findPivotIndex(list.subList(mid, list.size()));
+
+		//no pivot
+		return 0;
+	}

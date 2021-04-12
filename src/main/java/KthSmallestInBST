@@ -1,0 +1,31 @@
+https://www.interviewbit.com/problems/kth-smallest-element-in-tree/
+
+	public int kthsmallest(TreeNode A, int B) {
+
+		int lastSeen = -1;
+		int seenCount = 0;
+
+		Stack<Object> stack = new Stack<>();
+		stack.push(A);
+
+		while (!stack.isEmpty()) {
+
+			Object current = stack.pop();
+			if (current == null)
+				continue;
+			if (current instanceof TreeNode) {
+
+				stack.push(((TreeNode) current).right);
+				stack.push(((TreeNode) current).val);
+				stack.push(((TreeNode) current).left);
+
+			} else {
+				lastSeen = (int) current;
+				seenCount++;
+				if (seenCount == B)
+					break;
+			}
+		}
+
+		return lastSeen;
+	}

@@ -1,0 +1,99 @@
+https://www.hackerrank.com/challenges/matrix-rotation-algo/problem
+
+	public static void main(String[] args) {
+
+		Scanner in = new Scanner(System.in);
+		int rows = in.nextInt();
+		int columns = in.nextInt();
+		int rotateCount = in.nextInt();
+
+		int[][] arr = new int[rows][columns];
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < columns; j++)
+				arr[i][j] = in.nextInt();
+
+		int[][] toPrint = rotate(arr, rotateCount);
+		print(toPrint);
+	}
+
+	private static int[][] rotate(int[][] arr, int rotateCount) {
+
+		int rows = arr.length;
+		int columns = arr[0].length;
+
+		int levelStart = 0;
+		int levelMax = rows > columns ? columns / 2 : rows / 2;
+
+		for (int level = levelStart; level < levelMax; level++) {
+
+			int xStart = level;
+			int yStart = level;
+
+			int xEnd = arr.length - level;
+			int yEnd = arr[level].length - level;
+
+			int traversalLength = ((xEnd - xStart) * 2) + ((yEnd - yStart - 2) * 2);
+			int effectiveRotations = rotateCount % traversalLength;
+
+			for (int count = 0; count < effectiveRotations; count++)
+				rotateAtLevel(arr, level);
+		}
+		return arr;
+	}
+
+	private static void rotateAtLevel(int[][] arr, int level) {
+
+		int xStart = level;
+		int yStart = level;
+
+		int xEnd = arr.length - level;
+		int yEnd = arr[level].length - level;
+
+		int valuePrev = arr[xStart][yStart];
+
+		//first increase on x
+		for (int x = xStart; x < xEnd; x++) {
+
+			int value = arr[x][yStart];
+			arr[x][yStart] = valuePrev;
+			valuePrev = value;
+		}
+		//		print(arr);
+
+		//now increase on y
+		for (int y = yStart + 1; y < yEnd; y++) {
+
+			int value = arr[xEnd - 1][y];
+			arr[xEnd - 1][y] = valuePrev;
+			valuePrev = value;
+		}
+		//		print(arr);
+
+		//now decrease on x
+		for (int x = xEnd - 2; x >= xStart; x--) {
+
+			int value = arr[x][yEnd - 1];
+			arr[x][yEnd - 1] = valuePrev;
+			valuePrev = value;
+		}
+		//		print(arr);
+
+		//now decrease on y
+		for (int y = yEnd - 2; y >= yStart; y--) {
+
+			int value = arr[xStart][y];
+			arr[xStart][y] = valuePrev;
+			valuePrev = value;
+		}
+		//		print(arr);
+	}
+
+	private static void print(int[][] arr) {
+
+		for (int[] anArr : arr) {
+			for (int anAnArr : anArr)
+				System.out.print(anAnArr + " ");
+			System.out.println();
+		}
+		System.out.println();
+	}

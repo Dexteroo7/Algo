@@ -1,0 +1,176 @@
+	private static final class Aho {
+
+		//state transition when character is found
+		private final int[][] gotoFunction;
+
+		//state transition when character is NOT found
+		private final int[] failureFunction;
+
+		//state to completed words mapping
+		private final Map<Integer, Set<String>> wordMap = new HashMap<>();
+
+		//the dictionary
+		private final String[] words;
+
+		private Aho(String[] words) {
+
+			//maximum states is same as sum total all possible characters
+			int maximumStates = (int) Stream.of(words)
+											.flatMapToInt(CharSequence::chars)
+											.count() + 1;
+			int maximumCharacters = Stream.of(words)
+										  .flatMapToInt(CharSequence::chars)
+										  .max()
+										  .orElse(-2) + 1;
+
+			this.gotoFunction = new int[maximumStates][maximumCharacters];
+			this.failureFunction = new int[maximumStates];
+			this.words = words;
+			initialize();
+		}
+
+		private void initialize() {
+
+			buildTrie();
+			buildFailureFunction();
+		}
+
+		private void buildTrie() {
+
+			//set everything to -1
+			Stream.of(gotoFunction)
+				  .forEach(gg -> Arrays.fill(gg, -1));
+
+			int state = 0;
+			for (int index = 0; index < words.length; index++) {
+
+				String word = words[index];
+				int currentState = 0;
+				for (int character : (Iterable<Integer>) word.chars()::iterator) {
+
+					//new node
+					if (gotoFunction[currentState][character] == -1)
+						gotoFunction[currentState][character] = ++state;
+
+					currentState = gotoFunction[currentState][character];
+				}
+
+				// Add current word in output function
+				int finalIndex = index;
+				wordMap.compute(currentState, (na, wordsAtState) -> {
+					if (wordsAtState == null)
+						wordsAtState = new HashSet<>();
+					wordsAtState.add(words[finalIndex]);
+					return wordsAtState;
+				});
+			}
+
+			// For all characters which don't have an edge from root, (or state 0) in Trie, add a goto edge to state 0 itself
+			for (int character = 0; character < gotoFunction[0].length; character++) {
+				if (gotoFunction[0][character] == -1)
+					gotoFunction[0][character] = 0;
+			}
+		}
+
+		private void buildFailureFunction() {
+
+			//set everything to -1
+			Stream.of(failureFunction)
+				  .forEach(gg -> Arrays.fill(gg, -1));
+
+			//Failure function is computed in breadth first order, using a queue
+			Queue<Integer> breadthFirstQueue = new ArrayDeque<>();
+
+			for (int character = 0; character < gotoFunction[0].length; character++) {
+				//All nodes of depth 1 have failure function value as 0
+				if (gotoFunction[0][character] != 0) {
+					failureFunction[gotoFunction[0][character]] = 0;
+					breadthFirstQueue.offer(gotoFunction[0][character]);
+				}
+			}
+
+			while (!breadthFirstQueue.isEmpty()) {
+
+				// Remove the front state from queue
+				int state = breadthFirstQueue.poll();
+
+				List<Integer> toConsider = new ArrayList<>();
+				for (int character = 0; character < gotoFunction[state].length; character++) {
+					if (gotoFunction[state][character] != -1)
+						toConsider.add(character);
+				}
+
+				//for the removed state, find failure function for all those characters for which goto function is not defined.
+				for (int character : toConsider) {
+
+					int nextState = gotoFunction[state][character];
+
+					if (nextState != -1) {
+
+						// Find failure state of removed state
+						int failure = failureFunction[state];
+
+						//Find the deepest node labeled by proper, suffix of string from root to current state.
+						while (gotoFunction[failure][character] == -1)
+							failure = failureFunction[failure];
+
+						failure = gotoFunction[failure][character];
+						failureFunction[nextState] = failure;
+
+						// Merge output values
+						Set<String> possibleCompeteWords = wordMap.getOrDefault(failure, Collections.emptySet());
+						wordMap.compute(nextState, (na, wordsAtState) -> {
+							if (wordsAtState == null)
+								wordsAtState = new HashSet<>();
+							wordsAtState.addAll(possibleCompeteWords);
+							return wordsAtState;
+						});
+
+						// Insert the next level node (of Trie) in Queue
+						breadthFirstQueue.offer(nextState);
+					}
+				}
+			}
+		}
+
+		private void findOccurrences(String text) {
+
+			// Initialize current state
+			int currentState = 0;
+
+			// Traverse the text through the automaton to find all occurrences of tokens
+			for (int index = 0; index < text.length(); index++) {
+
+				int nextInput = text.charAt(index);
+				currentState = findNextState(currentState, nextInput);
+
+				Set<String> found = wordMap.getOrDefault(currentState, Collections.emptySet());
+				if (!found.isEmpty()) {
+
+					for (String word : found) {
+						System.out.printf("Word %s appears from %d to %d%n",
+										  word,
+										  index - word.length() + 1,
+										  index);
+					}
+				}
+			}
+		}
+
+		private int findNextState(int currentState, int nextInput) {
+
+			int nextState = currentState;
+			// If goto is not defined, use failure function
+			while (gotoFunction[nextState][nextInput] == -1)
+				nextState = failureFunction[nextState];
+
+			return gotoFunction[nextState][nextInput];
+		}
+	}
+
+	public static void main(String[] args) {
+
+		Aho aho = new Aho(new String[] { "he", "she", "hers", "his" });
+		aho.initialize();
+		aho.findOccurrences("ahishers");
+	}

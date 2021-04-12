@@ -1,0 +1,127 @@
+https://www.hackerearth.com/practice/data-structures/advanced-data-structures/segment-trees/practice-problems/algorithm/range-minimum-query/description/
+
+	private static final class Segment {
+
+		final List<Integer> data;
+		int min;
+
+		private Segment(List<Integer> data) {
+			this.data = data;
+			min = Integer.MAX_VALUE;
+			for (int i = 0; i < data.size(); i++)
+				if (data.get(i) < min)
+					min = data.get(i);
+		}
+
+		private void updateData(int index, int newValue) {
+
+			if (min >= newValue) {
+				data.set(index, newValue);
+				min = newValue;
+			} else if (data.get(index) == min) {
+
+				data.set(index, newValue);
+				min = Integer.MAX_VALUE;
+				for (int i = 0; i < data.size(); i++)
+					if (data.get(i) < min)
+						min = data.get(i);
+			} else
+				data.set(index, newValue);
+		}
+
+		private int minScan(int start, int end) {
+
+			if (start == 0 && end == data.size())
+				return min;
+			int min = Integer.MAX_VALUE;
+			for (int i = start; i < end; i++)
+				if (data.get(i) < min)
+					min = data.get(i);
+			return min;
+		}
+	}
+
+	private static final class RMQ {
+
+		final List<Segment> segments = new ArrayList<>();
+		final int optimalSize;
+
+		private RMQ(List<Integer> initialData) {
+
+			int length = initialData.size();
+			int optimalSize = (int) Math.sqrt(length);
+			if (optimalSize < 1)
+				optimalSize = 1;
+
+			this.optimalSize = optimalSize;
+
+			int endPointer = 0;
+			while (endPointer < initialData.size()) {
+
+				segments.add(new Segment(initialData.subList(endPointer, Integer.min(endPointer + optimalSize,
+																					 initialData.size()))));
+				endPointer += optimalSize;
+			}
+		}
+
+		private void updateData(int index, int newValue) {
+
+			int segmentIndex = index / optimalSize;
+
+			segments.get(segmentIndex)
+					.updateData(index - (segmentIndex * optimalSize), newValue);
+		}
+
+		private int getMinimum(int start, int end) {
+
+			int startSegmentIndex = start / optimalSize;
+			int endSegmentIndex = (end - 1) / optimalSize;
+
+			int mappedStart = start - (startSegmentIndex * optimalSize);
+			int mappedEnd = end - (endSegmentIndex * optimalSize);
+
+			if (startSegmentIndex == endSegmentIndex)
+				return segments.get(startSegmentIndex).minScan(mappedStart, mappedEnd);
+
+			Segment startSegment = segments.get(startSegmentIndex);
+			Segment endSegment = segments.get(endSegmentIndex);
+			int startSegmentMin = startSegment.minScan(mappedStart, startSegment.data.size());
+			int endSegmentMin = endSegment.minScan(0, mappedEnd);
+			int min = Integer.min(startSegmentMin, endSegmentMin);
+			for (int i = startSegmentIndex + 1; i < endSegmentIndex; i++)
+				if (segments.get(i).min < min)
+					min = segments.get(i).min;
+
+			return min;
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+
+		String[] split = reader.readLine().split("\\s");
+		int arraySize = Integer.parseInt(split[0]);
+		int queries = Integer.parseInt(split[1]);
+
+		List<Integer> initialData = new ArrayList<>(arraySize);
+		split = reader.readLine().split("\\s");
+		for (int i = 0; i < arraySize; i++)
+			initialData.add(Integer.parseInt(split[i]));
+
+		RMQ rmq = new RMQ(initialData);
+
+		for (int i = 0; i < queries; i++) {
+
+			split = reader.readLine().split("\\s");
+			String command = split[0];
+			int a = Integer.parseInt(split[1]);
+			int b = Integer.parseInt(split[2]);
+			if (command.equals("q")) {
+				writer.write(rmq.getMinimum(a - 1, b) + "\n");
+			} else
+				rmq.updateData(a - 1, b);
+		}
+		writer.flush();
+	}
