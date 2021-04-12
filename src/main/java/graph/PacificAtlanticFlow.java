@@ -37,16 +37,19 @@ class PacificAtlanticFlow {
 
     public void bfs(int[][] matrix, boolean[][] canFlow, int row, int column) {
 
-        //already visited
-        //can already flow
-        if (canFlow[row][column])
-            return;
-        canFlow[row][column] = true;
+        LinkedList<int[]> traversal = new LinkedList<>();
+        traversal.add(new int[]{row, column});
 
-        //can flow to these neighbours
-        List<int[]> neighbours = neighbours(matrix, row, column);
-        for (int[] neighbour : neighbours) {
-            bfs(matrix, canFlow, neighbour[0], neighbour[1]);
+        while (!traversal.isEmpty()) {
+
+            int[] current = traversal.removeFirst();
+            if (canFlow[current[0]][current[1]])
+                continue;
+            canFlow[current[0]][current[1]] = true;
+
+            //can flow to these neighbours
+            List<int[]> neighbours = neighbours(matrix, current[0], current[1]);
+            traversal.addAll(neighbours);
         }
     }
 

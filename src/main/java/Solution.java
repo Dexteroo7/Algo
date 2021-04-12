@@ -1,59 +1,68 @@
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.stream.Stream;
 
 class Solution {
+    public int maxDistance(int[][] grid) {
 
-    public String minWindow(String string, String toFind) {
-
-        if (toFind.length() == 1)
-            return string.contains(toFind) ? toFind : "";
-
-        int min = Integer.MAX_VALUE;
-        int leftMin = -1, rightMin = -1;
-
-        Map<Character, Integer> needToLookFor = new HashMap<>();
-        for (int i = 0; i < toFind.length(); i++) {
-            needToLookFor.merge(toFind.charAt(i), 1, Integer::sum);
+        int[][] distances = new int[grid.length][];
+        for (int i = 0; i < distances.length; i++) {
+            distances[i] = new int[grid[i].length];
+            Arrays.fill(distances[i], Integer.MAX_VALUE);
         }
 
-        Map<Character, Integer> runningCount = new HashMap<>();
-        int formed = 0;
-        for (int left = 0, right = 0; right < string.length(); right++) {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
 
-            char charAt = string.charAt(right);
-            if (needToLookFor.containsKey(charAt)) {
-                runningCount.merge(charAt, 1, Integer::sum);
-                formed++;
-            }
+                if (grid[i][j] == 0)
+                    continue;
 
-            while (formed == needToLookFor.keySet().size()) {
+                LinkedList<int[]> traversalQueue = new LinkedList<>();
+                traversalQueue.addFirst(new int[]{i, j});
+                while (!traversalQueue.isEmpty()) {
 
-                int size = right - left + 1;
-                if (size < min) {
-                    min = size;
-                    leftMin = left;
-                    rightMin = right;
-                }
-                char charAtLeft = string.charAt(left);
-                if (needToLookFor.containsKey(charAtLeft)) {
-                    int found = runningCount.merge(charAtLeft, -1, Integer::sum);
-                    if (found == 0) {
-                        formed--;
+                    int[] poll = traversalQueue.removeFirst();
+                    int distance = distance(i, j, poll[0], poll[1]);
+                    if (distance >= distances[poll[0]][poll[1]])
+                        continue;
+
+                    distances[poll[0]][poll[1]] = distance;
+
+                    if (poll[0] - 1 >= 0 && grid[poll[0] - 1][poll[1]] == 0) {
+                        traversalQueue.add(new int[]{poll[0] - 1, poll[1]});
+                    }
+                    if (poll[0] + 1 < grid.length && grid[poll[0] + 1][poll[1]] == 0) {
+                        traversalQueue.add(new int[]{poll[0] + 1, poll[1]});
+                    }
+                    if (poll[1] - 1 >= 0 && grid[poll[0]][poll[1] - 1] == 0) {
+                        traversalQueue.add(new int[]{poll[0], poll[1] - 1});
+                    }
+                    if (poll[1] + 1 < grid[0].length && grid[poll[0]][poll[1 + 1]] == 0) {
+                        traversalQueue.add(new int[]{poll[0], poll[1] + 1});
                     }
                 }
-                left++;
             }
         }
 
-        if (leftMin == -1 || rightMin == -1)
-            return "";
+        int maxDist = -1;
+        for (int i = 0; i < distances.length; i++) {
+            for (int j = 0; j < distances[i].length; j++) {
+                if (grid[i][j] == 1)
+                    continue;
+                maxDist = Integer.max(maxDist, distances[i][j]);
+            }
+        }
 
-        return string.substring(leftMin, rightMin + 1);
+        return maxDist == Integer.MAX_VALUE ? -1 : maxDist;
     }
 
-    public static void main(String[] args) {
+    public int distance(int a1, int b1, int a2, int b2) {
 
-        Solution solution = new Solution();
-        solution.minWindow("ADOBECODEBANC", "ABC");
+        int x = a1 - a2;
+        x = x < 0 ? -x : x;
+        int y = b1 - b2;
+        y = y < 0 ? -y : y;
+        return x + y;
     }
 }
